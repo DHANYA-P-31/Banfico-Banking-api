@@ -1,30 +1,24 @@
-package com.banfico.banking_api.entity;
+package com.banfico.banking_api.dto;
 
-import jakarta.persistence.*;
+public class CustomerResponse {
 
-@Entity
-@Table(name = "customers")
-public class Customer {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(nullable = false, unique = true)
     private String phoneNumber;
-
     private String address;
 
-    public Customer() {
+    public CustomerResponse() {
     }
 
-    public Customer(String name, String email, String phoneNumber, String address) {
+    public CustomerResponse(
+            Long id,
+            String name,
+            String email,
+            String phoneNumber,
+            String address) {
+
+        this.id = id;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
