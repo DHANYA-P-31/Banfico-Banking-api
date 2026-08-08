@@ -100,3 +100,49 @@ Response
   "gitCommitId": "ef8ec70"
 }
 ```
+
+## API Endpoints
+
+### Customers
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | /api/customers | Create customer |
+| GET | /api/customers | Get all customers |
+| GET | /api/customers/{id} | Get customer by ID |
+
+### Bank Accounts
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | /api/accounts | Create account |
+| GET | /api/accounts | Get all accounts |
+| GET | /api/accounts/{accountId} | Get account by ID |
+
+### Transactions
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | /api/accounts/{accountId}/transactions | Create transaction |
+| GET | /api/accounts/{accountId}/transactions | Get account transactions |
+
+### Beneficiaries
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | /api/beneficiaries | Create beneficiary |
+| GET | /api/beneficiaries | Get beneficiaries |
+| DELETE | /api/beneficiaries/{id} | Delete beneficiary |
+
+## Validation and Error Handling
+
+The application uses Jakarta Bean Validation for request validation
+and a global exception handler for consistent error responses.
+
+Common responses:
+
+- 200 OK
+- 201 Created
+- 204 No Content
+- 400 Bad Request
+- 404 Not Found
