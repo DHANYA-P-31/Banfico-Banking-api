@@ -1,29 +1,30 @@
 package com.banfico.banking_api.dto;
 
-import java.math.BigDecimal;
-
-public class BankAccountResponse {
+public class BeneficiaryResponse {
 
     private Long id;
+    private String name;
     private String accountNumber;
-    private String accountType;
-    private BigDecimal balance;
+    private String bankName;
+    private String ifscCode;
     private Long customerId;
 
-    public BankAccountResponse() {
+    public BeneficiaryResponse() {
     }
 
-    public BankAccountResponse(
+    public BeneficiaryResponse(
             Long id,
+            String name,
             String accountNumber,
-            String accountType,
-            BigDecimal balance,
+            String bankName,
+            String ifscCode,
             Long customerId) {
 
         this.id = id;
+        this.name = name;
         this.accountNumber = accountNumber;
-        this.accountType = accountType;
-        this.balance = balance;
+        this.bankName = bankName;
+        this.ifscCode = ifscCode;
         this.customerId = customerId;
     }
 
@@ -35,6 +36,14 @@ public class BankAccountResponse {
         this.id = id;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getAccountNumber() {
         return accountNumber;
     }
@@ -43,20 +52,20 @@ public class BankAccountResponse {
         this.accountNumber = accountNumber;
     }
 
-    public String getAccountType() {
-        return accountType;
+    public String getBankName() {
+        return bankName;
     }
 
-    public void setAccountType(String accountType) {
-        this.accountType = accountType;
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
     }
 
-    public BigDecimal getBalance() {
-        return balance;
+    public String getIfscCode() {
+        return ifscCode;
     }
 
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
+    public void setIfscCode(String ifscCode) {
+        this.ifscCode = ifscCode;
     }
 
     public Long getCustomerId() {
