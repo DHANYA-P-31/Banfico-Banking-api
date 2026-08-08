@@ -69,7 +69,7 @@ docker run -p 8080:8080 banking-api
 ### Health Check
 
 ```
-GET /api/health
+GET /health
 
 ```
 
@@ -100,9 +100,29 @@ Response
   "gitCommitId": "ef8ec70"
 }
 ```
+### Project Health Check
+
+```
+
+GET /api/health
+
+```
+
+Response:
+
+```
+{
+  "status": "UP",
+  "application": "banking-api",
+  "timestamp": "2026-08-08T08:41:43.8175595"
+}
+
+```
+
 ### Database Health Check
 
 ```
+
 GET /api/health/database
 
 ```
@@ -110,7 +130,12 @@ GET /api/health/database
 Response:
 
 ```
-Application Running
+{
+  "status": "UP",
+  "database": "PostgreSQL",
+  "connection": "ACTIVE",
+  "timestamp": "2026-08-08T08:40:58.2061614"
+}
 
 ```
 ## API Endpoints
