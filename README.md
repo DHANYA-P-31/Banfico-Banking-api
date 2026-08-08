@@ -69,7 +69,7 @@ docker run -p 8080:8080 banking-api
 ### Health Check
 
 ```
-GET /health
+GET /api/health
 
 ```
 
@@ -100,7 +100,19 @@ Response
   "gitCommitId": "ef8ec70"
 }
 ```
+### Database Health Check
 
+```
+GET /api/health/database
+
+```
+
+Response:
+
+```
+Application Running
+
+```
 ## API Endpoints
 
 ### Customers
