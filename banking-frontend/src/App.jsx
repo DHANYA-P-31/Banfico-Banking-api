@@ -1,12 +1,9 @@
-import API_BASE_URL from "./services/api";
+import CustomerList from "./pages/CustomerList";
 
 function App() {
-  return (
-      <div>
-        <h1>Banfico Banking</h1>
-        <p>Backend: {API_BASE_URL}</p>
-      </div>
-  );
+    return (
+        <CustomerList />
+    );
 }
 
 export default App;
