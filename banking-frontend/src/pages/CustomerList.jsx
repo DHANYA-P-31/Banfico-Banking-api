@@ -62,7 +62,7 @@ function CustomerList() {
                             <td>{customer.id}</td>
                             <td>{customer.name}</td>
                             <td>{customer.email}</td>
-                            <td>{customer.phone}</td>
+                            <td>{customer.phoneNumber}</td>
                         </tr>
                     ))}
                     </tbody>
