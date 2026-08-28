@@ -53,6 +53,7 @@ function CustomerList() {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
+                        <th>Address</th>
                     </tr>
                     </thead>
 
@@ -63,6 +64,7 @@ function CustomerList() {
                             <td>{customer.name}</td>
                             <td>{customer.email}</td>
                             <td>{customer.phoneNumber}</td>
+                            <td>{customer.address}</td>
                         </tr>
                     ))}
                     </tbody>
