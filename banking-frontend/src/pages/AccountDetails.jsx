@@ -67,6 +67,13 @@ function AccountDetails() {
             </p>
 
             <Link to="/accounts">Back to Accounts</Link>
+
+            <br />
+
+            <Link to={`/accounts/${account.id}/transactions`}>
+                View Transactions
+            </Link>
+
         </div>
     );
 }

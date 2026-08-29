@@ -4,6 +4,7 @@ import CustomerList from "./pages/CustomerList";
 import CreateCustomer from "./pages/CreateCustomer";
 import AccountList from "./pages/AccountList";
 import AccountDetails from "./pages/AccountDetails";
+import TransactionHistory from "./pages/TransactionHistory";
 
 function App() {
     return (
@@ -34,7 +35,10 @@ function App() {
                     path="/accounts/:id"
                     element={<AccountDetails />}
                 />
-
+                <Route
+                    path="/accounts/:id/transactions"
+                    element={<TransactionHistory />}
+                />
             </Routes>
         </BrowserRouter>
     );
