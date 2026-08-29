@@ -7,24 +7,58 @@ function BeneficiaryList() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(`${API_BASE_URL}/api/beneficiaries`)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch beneficiaries");
-                }
-
-                return response.json();
-            })
-            .then((data) => {
-                setBeneficiaries(data);
-            })
-            .catch((error) => {
-                setError(error.message);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+        fetchBeneficiaries();
     }, []);
+
+    async function fetchBeneficiaries() {
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/api/beneficiaries`
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch beneficiaries");
+            }
+
+            const data = await response.json();
+            setBeneficiaries(data);
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function handleDelete(id) {
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this beneficiary?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/api/beneficiaries/${id}`,
+                {
+                    method: "DELETE",
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to delete beneficiary");
+            }
+
+            setBeneficiaries(
+                beneficiaries.filter(
+                    (beneficiary) => beneficiary.id !== id
+                )
+            );
+        } catch (error) {
+            setError(error.message);
+        }
+    }
 
     if (loading) {
         return <p>Loading beneficiaries...</p>;
@@ -50,6 +84,7 @@ function BeneficiaryList() {
                         <th>Bank Name</th>
                         <th>IFSC Code</th>
                         <th>Customer ID</th>
+                        <th>Action</th>
                     </tr>
                     </thead>
 
@@ -62,6 +97,16 @@ function BeneficiaryList() {
                             <td>{beneficiary.bankName}</td>
                             <td>{beneficiary.ifscCode}</td>
                             <td>{beneficiary.customerId}</td>
+
+                            <td>
+                                <button
+                                    onClick={() =>
+                                        handleDelete(beneficiary.id)
+                                    }
+                                >
+                                    Delete
+                                </button>
+                            </td>
                         </tr>
                     ))}
                     </tbody>
