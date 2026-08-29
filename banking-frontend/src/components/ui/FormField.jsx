@@ -1,0 +1,12 @@
+function FormField({ label, htmlFor, error, hint, children }) {
+  return (
+    <div className="field">
+      {label && <label htmlFor={htmlFor}>{label}</label>}
+      {children}
+      {hint && !error && <span className="hint">{hint}</span>}
+      {error && <span className="field-error">{error}</span>}
+    </div>
+  );
+}
+
+export default FormField;
