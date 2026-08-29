@@ -12,6 +12,8 @@ import CreateAccount from "./pages/CreateAccount";
 import BeneficiaryList from "./pages/BeneficiaryList";
 import AddBeneficiary from "./pages/AddBeneficiary";
 
+import Home from "./pages/Home";
+
 function App() {
     return (
         <BrowserRouter>
@@ -55,6 +57,11 @@ function App() {
                 <Route
                     path="/beneficiaries/add"
                     element={<AddBeneficiary />}
+                />
+
+                <Route
+                    path="/"
+                    element={<Home />}
                 />
 
             </Routes>
