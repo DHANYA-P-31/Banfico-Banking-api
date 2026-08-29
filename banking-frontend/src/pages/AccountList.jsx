@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import API_BASE_URL from "../services/api";
+import { Link } from "react-router-dom";
 
 function AccountList() {
     const [accounts, setAccounts] = useState([]);
@@ -25,7 +26,9 @@ function AccountList() {
     return (
         <div>
             <h2>Account List</h2>
-
+            <Link to="/accounts/create">
+                Create Account
+            </Link>
             {error && <p>{error}</p>}
 
             {accounts.length === 0 && !error ? (

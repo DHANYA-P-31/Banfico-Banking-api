@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import API_BASE_URL from "../services/api";
+import { Link } from "react-router-dom";
 
 function BeneficiaryList() {
     const [beneficiaries, setBeneficiaries] = useState([]);
@@ -73,8 +74,10 @@ function BeneficiaryList() {
     return (
         <div>
             <h2>Beneficiary List</h2>
-
             {error && <p>{error}</p>}
+            <Link to="/beneficiaries/add">
+                Add Beneficiary
+            </Link>
 
             {!error && beneficiaries.length === 0 && (
                 <p>No beneficiaries found.</p>

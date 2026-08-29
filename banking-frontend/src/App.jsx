@@ -1,23 +1,26 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Navbar from "./components/Navbar";
 
 import CustomerList from "./pages/CustomerList";
 import CreateCustomer from "./pages/CreateCustomer";
+
 import AccountList from "./pages/AccountList";
 import AccountDetails from "./pages/AccountDetails";
-import TransactionHistory from "./pages/TransactionHistory";
+import CreateAccount from "./pages/CreateAccount";
+
 import BeneficiaryList from "./pages/BeneficiaryList";
 import AddBeneficiary from "./pages/AddBeneficiary";
-import CreateAccount from "./pages/CreateAccount";
 
 function App() {
     return (
         <BrowserRouter>
-            <Routes>
 
-                <Route
-                    path="/"
-                    element={<Navigate to="/accounts" replace />}
-                />
+            <h1>My Banking App</h1>
+
+            <Navbar />
+
+            <Routes>
 
                 <Route
                     path="/customers"
@@ -35,26 +38,27 @@ function App() {
                 />
 
                 <Route
+                    path="/accounts/create"
+                    element={<CreateAccount />}
+                />
+
+                <Route
                     path="/accounts/:id"
                     element={<AccountDetails />}
                 />
-                <Route
-                    path="/accounts/:id/transactions"
-                    element={<TransactionHistory />}
-                />
+
                 <Route
                     path="/beneficiaries"
                     element={<BeneficiaryList />}
                 />
+
                 <Route
                     path="/beneficiaries/add"
                     element={<AddBeneficiary />}
                 />
-                <Route
-                    path="/accounts/create"
-                    element={<CreateAccount />}
-                />
+
             </Routes>
+
         </BrowserRouter>
     );
 }

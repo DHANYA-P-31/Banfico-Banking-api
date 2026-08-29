@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import API_BASE_URL from "../services/api";
+import { Link } from "react-router-dom";
 
 function CustomerList() {
     const [customers, setCustomers] = useState([]);
@@ -42,7 +43,9 @@ function CustomerList() {
     return (
         <div>
             <h1>Customers</h1>
-
+            <Link to="/customers/create">
+                Create Customer
+            </Link>
             {customers.length === 0 ? (
                 <p>No customers found.</p>
             ) : (
