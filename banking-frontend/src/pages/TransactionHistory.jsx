@@ -1,26 +1,29 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import API_BASE_URL from "../services/api";
 
 function TransactionHistory() {
-
     const { id } = useParams();
-    const navigate = useNavigate();
-
     const [transactions, setTransactions] = useState([]);
+
+    // Updated initial state to match Spring Boot Enum constraints
+    const [formData, setFormData] = useState({
+        type: "DEPOSIT",
+        amount: ""
+    });
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [message, setMessage] = useState("");
 
     useEffect(() => {
         fetchTransactions();
     }, [id]);
 
     const fetchTransactions = async () => {
-
         try {
             setLoading(true);
             setError("");
-
             const response = await fetch(
                 `${API_BASE_URL}/api/accounts/${id}/transactions`
             );
@@ -30,19 +33,57 @@ function TransactionHistory() {
             }
 
             const data = await response.json();
-
             setTransactions(data);
-
         } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-            setError(
-                "Unable to load transactions. Please check the backend."
+    const handleChange = (event) => {
+        setFormData({
+            ...formData,
+            [event.target.name]: event.target.value
+        });
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        setError("");
+        setMessage("");
+
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/api/accounts/${id}/transactions`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        type: formData.type,
+                        amount: Number(formData.amount),
+                        transactionDate: new Date().toISOString()
+                    })
+                }
             );
 
-        } finally {
+            if (!response.ok) {
+                throw new Error("Failed to create transaction");
+            }
 
-            setLoading(false);
+            setMessage("Transaction created successfully!");
 
+            // Form reset matches Backend Enum values
+            setFormData({
+                type: "DEPOSIT",
+                amount: ""
+            });
+
+            fetchTransactions();
+        } catch (error) {
+            setError(error.message);
         }
     };
 
@@ -50,72 +91,85 @@ function TransactionHistory() {
         return <p>Loading transactions...</p>;
     }
 
-    if (error) {
-        return (
-            <div>
-                <p>{error}</p>
-
-                <button onClick={() => navigate(`/accounts/${id}`)}>
-                    Back to Account
-                </button>
-            </div>
-        );
-    }
-
     return (
         <div>
+            <h2>Transaction History</h2>
+            <p>
+                <strong>Account ID:</strong> {id}
+            </p>
 
-            <h1>Transaction History</h1>
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            {message && <p style={{ color: "green" }}>{message}</p>}
 
-            <h2>Account ID: {id}</h2>
+            <h3>Create Transaction</h3>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label>Type: </label>
+                    <select
+                        name="type"
+                        value={formData.type}
+                        onChange={handleChange}
+                    >
+                        {/* Option values strictly match backend Enum [DEPOSIT, WITHDRAWAL] */}
+                        <option value="DEPOSIT">Deposit (Credit)</option>
+                        <option value="WITHDRAWAL">Withdrawal (Debit)</option>
+                    </select>
+                </div>
+
+                <br />
+
+                <div>
+                    <label>Amount: </label>
+                    <input
+                        type="number"
+                        name="amount"
+                        value={formData.amount}
+                        onChange={handleChange}
+                        min="1"
+                        required
+                    />
+                </div>
+
+                <br />
+
+                <button type="submit">
+                    Create Transaction
+                </button>
+            </form>
+
+            <hr />
+
+            <h3>Transactions</h3>
 
             {transactions.length === 0 ? (
-
                 <p>No transactions found.</p>
-
             ) : (
-
-                <table border="1">
-
+                <table border="1" cellPadding="5" style={{ borderCollapse: "collapse" }}>
                     <thead>
                     <tr>
                         <th>ID</th>
                         <th>Type</th>
                         <th>Amount</th>
-                        <th>transactionDate</th>
+                        <th>Date</th>
                     </tr>
                     </thead>
-
                     <tbody>
-
                     {transactions.map((transaction) => (
-
                         <tr key={transaction.id}>
-
                             <td>{transaction.id}</td>
-
                             <td>{transaction.type}</td>
-
                             <td>₹{transaction.amount}</td>
-
-                            <td>{new Date(transaction.transactionDate).toDateString()}</td>
-
+                            <td>{new Date(transaction.transactionDate).toLocaleDateString()}</td>
                         </tr>
-
                     ))}
-
                     </tbody>
-
                 </table>
-
             )}
 
             <br />
-
-            <button onClick={() => navigate(`/accounts/${id}`)}>
+            <Link to={`/accounts/${id}`}>
                 Back to Account
-            </button>
-
+            </Link>
         </div>
     );
 }
