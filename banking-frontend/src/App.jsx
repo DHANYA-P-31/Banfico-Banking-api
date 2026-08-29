@@ -7,6 +7,7 @@ import AccountDetails from "./pages/AccountDetails";
 import TransactionHistory from "./pages/TransactionHistory";
 import BeneficiaryList from "./pages/BeneficiaryList";
 import AddBeneficiary from "./pages/AddBeneficiary";
+import CreateAccount from "./pages/CreateAccount";
 
 function App() {
     return (
@@ -48,6 +49,10 @@ function App() {
                 <Route
                     path="/beneficiaries/add"
                     element={<AddBeneficiary />}
+                />
+                <Route
+                    path="/accounts/create"
+                    element={<CreateAccount />}
                 />
             </Routes>
         </BrowserRouter>
