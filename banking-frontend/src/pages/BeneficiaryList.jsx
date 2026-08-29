@@ -47,7 +47,13 @@ function BeneficiaryList() {
             );
 
             if (!response.ok) {
-                throw new Error("Failed to delete beneficiary");
+                if (response.status === 404) {
+                    throw new Error("Beneficiary not found");
+                }
+
+                throw new Error(
+                    `Unable to delete beneficiary (${response.status})`
+                );
             }
 
             setBeneficiaries(
