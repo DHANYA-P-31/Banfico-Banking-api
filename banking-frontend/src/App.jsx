@@ -5,6 +5,7 @@ import CreateCustomer from "./pages/CreateCustomer";
 import AccountList from "./pages/AccountList";
 import AccountDetails from "./pages/AccountDetails";
 import TransactionHistory from "./pages/TransactionHistory";
+import BeneficiaryList from "./pages/BeneficiaryList";
 
 function App() {
     return (
@@ -38,6 +39,10 @@ function App() {
                 <Route
                     path="/accounts/:id/transactions"
                     element={<TransactionHistory />}
+                />
+                <Route
+                    path="/beneficiaries"
+                    element={<BeneficiaryList />}
                 />
             </Routes>
         </BrowserRouter>
