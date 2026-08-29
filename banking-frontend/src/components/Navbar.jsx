@@ -15,7 +15,7 @@ function Navbar() {
           <span className="mark">
             <Landmark size={13} strokeWidth={2.5} />
           </span>
-          Banfico Bank
+          Our Bank
         </NavLink>
 
         <nav className="appbar-links">
