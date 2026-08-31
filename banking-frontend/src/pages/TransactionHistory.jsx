@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import API_BASE_URL from "../services/api";
+import API_BASE_URL, { parseErrorMessage } from "../services/api";
 import { formatCurrency } from "../utils/format";
 import PageHeader from "../components/ui/PageHeader";
 import Card from "../components/ui/Card";
@@ -36,7 +36,7 @@ function TransactionHistory() {
       setLoading(true);
       setError("");
       const response = await fetch(
-        `${API_BASE_URL}/api/accounts/${id}/transactions`
+          `${API_BASE_URL}/api/accounts/${id}/transactions`
       );
 
       if (!response.ok) {
@@ -66,22 +66,24 @@ function TransactionHistory() {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/accounts/${id}/transactions`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            type: formData.type,
-            amount: Number(formData.amount),
-            transactionDate: new Date().toISOString(),
-          }),
-        }
+          `${API_BASE_URL}/api/accounts/${id}/transactions`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              type: formData.type,
+              amount: Number(formData.amount),
+              transactionDate: new Date().toISOString(),
+            }),
+          }
       );
 
       if (!response.ok) {
-        throw new Error("Failed to create transaction");
+        throw new Error(
+            await parseErrorMessage(response, "Failed to create transaction")
+        );
       }
 
       setMessage("Transaction created successfully!");
@@ -99,102 +101,102 @@ function TransactionHistory() {
   };
 
   return (
-    <div className="page">
-      <PageHeader
-        title="Transaction History"
-        description={`Account ID ${id}`}
-        action={
-          <Button as={Link} to={`/accounts/${id}`} variant="secondary" size="sm">
-            <ArrowLeft size={14} /> Back to Account
-          </Button>
-        }
-      />
+      <div className="page">
+        <PageHeader
+            title="Transaction History"
+            description={`Account ID ${id}`}
+            action={
+              <Button as={Link} to={`/accounts/${id}`} variant="secondary" size="sm">
+                <ArrowLeft size={14} /> Back to Account
+              </Button>
+            }
+        />
 
-      <Card title="Create Transaction" style={{ maxWidth: 480, marginBottom: "var(--space-5)" }}>
-        <Banner variant="error">{error}</Banner>
-        <Banner variant="success">{message}</Banner>
+        <Card title="Create Transaction" style={{ maxWidth: 480, marginBottom: "var(--space-5)" }}>
+          <Banner variant="error">{error}</Banner>
+          <Banner variant="success">{message}</Banner>
 
-        <form onSubmit={handleSubmit}>
-          <FormField label="Type" htmlFor="type">
-            <select
-              id="type"
-              className="input"
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-            >
-              {/* Option values strictly match backend Enum [DEPOSIT, WITHDRAWAL] */}
-              <option value="DEPOSIT">Deposit (Credit)</option>
-              <option value="WITHDRAWAL">Withdrawal (Debit)</option>
-            </select>
-          </FormField>
+          <form onSubmit={handleSubmit}>
+            <FormField label="Type" htmlFor="type">
+              <select
+                  id="type"
+                  className="input"
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+              >
+                {/* Option values strictly match backend Enum [DEPOSIT, WITHDRAWAL] */}
+                <option value="DEPOSIT">Deposit (Credit)</option>
+                <option value="WITHDRAWAL">Withdrawal (Debit)</option>
+              </select>
+            </FormField>
 
-          <FormField label="Amount" htmlFor="amount">
-            <Input
-              id="amount"
-              type="number"
-              name="amount"
-              value={formData.amount}
-              onChange={handleChange}
-              min="1"
-              required
-            />
-          </FormField>
+            <FormField label="Amount" htmlFor="amount">
+              <Input
+                  id="amount"
+                  type="number"
+                  name="amount"
+                  value={formData.amount}
+                  onChange={handleChange}
+                  min="1"
+                  required
+              />
+            </FormField>
 
-          <Button type="submit">Create Transaction</Button>
-        </form>
-      </Card>
+            <Button type="submit">Create Transaction</Button>
+          </form>
+        </Card>
 
-      <h2>Transactions</h2>
+        <h2>Transactions</h2>
 
-      {loading ? (
-        <LoadingState label="Loading transactions..." />
-      ) : transactions.length === 0 ? (
-        <EmptyState title="No transactions yet" />
-      ) : (
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((transaction) => (
-                <tr key={transaction.id}>
-                  <td className="num">{transaction.id}</td>
-                  <td>
-                    <Badge
-                      variant={
-                        transaction.type === "DEPOSIT" ? "success" : "danger"
-                      }
-                    >
-                      {transaction.type}
-                    </Badge>
-                  </td>
-                  <td
-                    className={
-                      transaction.type === "DEPOSIT"
-                        ? "amount-credit"
-                        : "amount-debit"
-                    }
-                  >
-                    {transaction.type === "DEPOSIT" ? "+" : "-"}
-                    {formatCurrency(transaction.amount)}
-                  </td>
-                  <td className="text-muted">
-                    {new Date(transaction.transactionDate).toLocaleDateString()}
-                  </td>
+        {loading ? (
+            <LoadingState label="Loading transactions..." />
+        ) : transactions.length === 0 ? (
+            <EmptyState title="No transactions yet" />
+        ) : (
+            <div className="table-wrap">
+              <table>
+                <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+                </thead>
+                <tbody>
+                {transactions.map((transaction) => (
+                    <tr key={transaction.id}>
+                      <td className="num">{transaction.id}</td>
+                      <td>
+                        <Badge
+                            variant={
+                              transaction.type === "DEPOSIT" ? "success" : "danger"
+                            }
+                        >
+                          {transaction.type}
+                        </Badge>
+                      </td>
+                      <td
+                          className={
+                            transaction.type === "DEPOSIT"
+                                ? "amount-credit"
+                                : "amount-debit"
+                          }
+                      >
+                        {transaction.type === "DEPOSIT" ? "+" : "-"}
+                        {formatCurrency(transaction.amount)}
+                      </td>
+                      <td className="text-muted">
+                        {new Date(transaction.transactionDate).toLocaleDateString()}
+                      </td>
+                    </tr>
+                ))}
+                </tbody>
+              </table>
+            </div>
+        )}
+      </div>
   );
 }
 

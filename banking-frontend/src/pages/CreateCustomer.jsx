@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API_BASE_URL from "../services/api";
+import API_BASE_URL, { parseErrorMessage } from "../services/api";
 import PageHeader from "../components/ui/PageHeader";
 import Card from "../components/ui/Card";
 import FormField from "../components/ui/FormField";
@@ -92,15 +92,9 @@ function CreateCustomer() {
       });
 
       if (!response.ok) {
-        if (response.status === 400) {
-          throw new Error("Invalid customer details.");
-        }
-
-        if (response.status === 409) {
-          throw new Error("Customer already exists.");
-        }
-
-        throw new Error(`Server error (${response.status})`);
+        throw new Error(
+            await parseErrorMessage(response, "Unable to create customer.")
+        );
       }
 
       setMessage("Customer created successfully!");
@@ -114,7 +108,7 @@ function CreateCustomer() {
     } catch (error) {
       if (error instanceof TypeError) {
         setError(
-          "Unable to connect to the server. Please make sure the backend is running."
+            "Unable to connect to the server. Please make sure the backend is running."
         );
       } else {
         setError(error.message);
@@ -123,78 +117,78 @@ function CreateCustomer() {
   };
 
   return (
-    <div className="page">
-      <PageHeader
-        title="Create Customer"
-        description="Add a new customer record."
-      />
+      <div className="page">
+        <PageHeader
+            title="Create Customer"
+            description="Add a new customer record."
+        />
 
-      <Card style={{ maxWidth: 480 }}>
-        <Banner variant="error">{error}</Banner>
-        <Banner variant="success">{message}</Banner>
+        <Card style={{ maxWidth: 480 }}>
+          <Banner variant="error">{error}</Banner>
+          <Banner variant="success">{message}</Banner>
 
-        <form onSubmit={handleSubmit}>
-          <FormField label="Name" htmlFor="name" error={errors.name}>
-            <Input
-              id="name"
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              error={errors.name}
-            />
-          </FormField>
+          <form onSubmit={handleSubmit}>
+            <FormField label="Name" htmlFor="name" error={errors.name}>
+              <Input
+                  id="name"
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  error={errors.name}
+              />
+            </FormField>
 
-          <FormField label="Email" htmlFor="email" error={errors.email}>
-            <Input
-              id="email"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              error={errors.email}
-            />
-          </FormField>
+            <FormField label="Email" htmlFor="email" error={errors.email}>
+              <Input
+                  id="email"
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  error={errors.email}
+              />
+            </FormField>
 
-          <FormField
-            label="Phone"
-            htmlFor="phoneNumber"
-            error={errors.phoneNumber}
-          >
-            <Input
-              id="phoneNumber"
-              type="text"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              error={errors.phoneNumber}
-            />
-          </FormField>
-
-          <FormField label="Address" htmlFor="address" error={errors.address}>
-            <Input
-              id="address"
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              error={errors.address}
-            />
-          </FormField>
-
-          <div className="row">
-            <Button type="submit">Create Customer</Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => navigate("/customers")}
+            <FormField
+                label="Phone"
+                htmlFor="phoneNumber"
+                error={errors.phoneNumber}
             >
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </Card>
-    </div>
+              <Input
+                  id="phoneNumber"
+                  type="text"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  error={errors.phoneNumber}
+              />
+            </FormField>
+
+            <FormField label="Address" htmlFor="address" error={errors.address}>
+              <Input
+                  id="address"
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  error={errors.address}
+              />
+            </FormField>
+
+            <div className="row">
+              <Button type="submit">Create Customer</Button>
+              <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => navigate("/customers")}
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </Card>
+      </div>
   );
 }
 

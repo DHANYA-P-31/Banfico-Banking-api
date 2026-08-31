@@ -147,6 +147,8 @@ Response:
 | POST | /api/customers | Create customer |
 | GET | /api/customers | Get all customers |
 | GET | /api/customers/{id} | Get customer by ID |
+| PUT | /api/customers/{id} | Update customer |
+| DELETE | /api/customers/{id} | Delete customer |
 
 ### Bank Accounts
 
@@ -155,6 +157,8 @@ Response:
 | POST | /api/accounts | Create account |
 | GET | /api/accounts | Get all accounts |
 | GET | /api/accounts/{accountId} | Get account by ID |
+| PUT | /api/accounts/{accountId} | Update account |
+| DELETE | /api/accounts/{accountId} | Delete account |
 
 ### Transactions
 
