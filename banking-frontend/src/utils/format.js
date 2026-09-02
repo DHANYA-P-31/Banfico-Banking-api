@@ -1,7 +1,3 @@
-/**
- * Formats a number as Indian Rupee currency, e.g. 15000 -> "₹15,000.00"
- * Falls back gracefully if value is null/undefined/NaN.
- */
 export function formatCurrency(value) {
   const num = Number(value);
 
