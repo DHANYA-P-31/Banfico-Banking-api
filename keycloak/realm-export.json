@@ -1,0 +1,108 @@
+{
+  "realm": "our-bank",
+  "enabled": true,
+  "displayName": "Our Bank",
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "sslRequired": "external",
+
+  "roles": {
+    "realm": [
+      {
+        "name": "ADMIN",
+        "description": "Full access - create accounts, delete beneficiaries, all admin actions"
+      },
+      {
+        "name": "MAKER",
+        "description": "Can create transactions (deposits/withdrawals)"
+      },
+      {
+        "name": "CHECKER",
+        "description": "Can approve/reject actions - delete beneficiaries alongside admin"
+      }
+    ]
+  },
+
+  "clients": [
+    {
+      "clientId": "our-frontend",
+      "name": "Our Bank Frontend",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    }
+  ],
+
+  "users": [
+    {
+      "username": "admin1",
+      "enabled": true,
+      "email": "admin1@banking.test",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ADMIN"]
+    },
+    {
+      "username": "maker1",
+      "enabled": true,
+      "email": "maker1@banking.test",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Maker@123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["MAKER"]
+    },
+    {
+      "username": "checker1",
+      "enabled": true,
+      "email": "checker1@banking.test",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Checker@123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["CHECKER"]
+    },
+    {
+      "username": "viewer1",
+      "enabled": true,
+      "email": "viewer1@banking.test",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Viewer@123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": []
+    }
+  ]
+}
