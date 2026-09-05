@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import API_BASE_URL from "../services/api";
+import API_BASE_URL, { authFetch } from "../services/api";
 import { Plus } from "lucide-react";
 import PageHeader from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
 import Banner from "../components/ui/Banner";
 import LoadingState from "../components/ui/LoadingState";
 import EmptyState from "../components/ui/EmptyState";
+import { useAuth } from "../auth/AuthContext";
 
 function CustomerList() {
+  const { hasRole } = useAuth();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -22,7 +24,7 @@ function CustomerList() {
       setLoading(true);
       setError("");
 
-      const response = await fetch(`${API_BASE_URL}/api/customers`);
+      const response = await authFetch(`${API_BASE_URL}/api/customers`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch customers");
@@ -39,54 +41,56 @@ function CustomerList() {
   };
 
   return (
-    <div className="page">
-      <PageHeader
-        title="Customers"
-        description="Onboarded customers and their contact details."
-        action={
-          <Button as={Link} to="/customers/create">
-            <Plus size={16} /> Create Customer
-          </Button>
-        }
-      />
-
-      <Banner variant="error">{error}</Banner>
-
-      {loading ? (
-        <LoadingState label="Loading customers..." />
-      ) : customers.length === 0 ? (
-        <EmptyState
-          title="No customers yet"
-          description="Create your first customer to get started."
+      <div className="page">
+        <PageHeader
+            title="Customers"
+            description="Onboarded customers and their contact details."
+            action={
+                hasRole("ADMIN") && (
+                    <Button as={Link} to="/customers/create">
+                      <Plus size={16} /> Create Customer
+                    </Button>
+                )
+            }
         />
-      ) : (
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Address</th>
-              </tr>
-            </thead>
 
-            <tbody>
-              {customers.map((customer) => (
-                <tr key={customer.id}>
-                  <td className="num">{customer.id}</td>
-                  <td>{customer.name}</td>
-                  <td>{customer.email}</td>
-                  <td className="num">{customer.phoneNumber}</td>
-                  <td>{customer.address}</td>
+        <Banner variant="error">{error}</Banner>
+
+        {loading ? (
+            <LoadingState label="Loading customers..." />
+        ) : customers.length === 0 ? (
+            <EmptyState
+                title="No customers yet"
+                description="Create your first customer to get started."
+            />
+        ) : (
+            <div className="table-wrap">
+              <table>
+                <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Address</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+                </thead>
+
+                <tbody>
+                {customers.map((customer) => (
+                    <tr key={customer.id}>
+                      <td className="num">{customer.id}</td>
+                      <td>{customer.name}</td>
+                      <td>{customer.email}</td>
+                      <td className="num">{customer.phoneNumber}</td>
+                      <td>{customer.address}</td>
+                    </tr>
+                ))}
+                </tbody>
+              </table>
+            </div>
+        )}
+      </div>
   );
 }
 

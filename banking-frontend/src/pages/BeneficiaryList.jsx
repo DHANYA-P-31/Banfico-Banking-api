@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import API_BASE_URL from "../services/api";
+import API_BASE_URL, { authFetch } from "../services/api";
 import { Plus, Trash2 } from "lucide-react";
 import PageHeader from "../components/ui/PageHeader";
 import Button from "../components/ui/Button";
 import Banner from "../components/ui/Banner";
 import LoadingState from "../components/ui/LoadingState";
 import EmptyState from "../components/ui/EmptyState";
+import { useAuth } from "../auth/AuthContext";
 
 function BeneficiaryList() {
+  const { hasRole } = useAuth();
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -22,7 +24,7 @@ function BeneficiaryList() {
       setLoading(true);
       setError("");
 
-      const response = await fetch(`${API_BASE_URL}/api/beneficiaries`);
+      const response = await authFetch(`${API_BASE_URL}/api/beneficiaries`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch beneficiaries");
@@ -39,7 +41,7 @@ function BeneficiaryList() {
 
   async function handleDelete(id) {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this beneficiary?"
+        "Are you sure you want to delete this beneficiary?"
     );
 
     if (!confirmed) {
@@ -47,11 +49,11 @@ function BeneficiaryList() {
     }
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/beneficiaries/${id}`,
-        {
-          method: "DELETE",
-        }
+      const response = await authFetch(
+          `${API_BASE_URL}/api/beneficiaries/${id}`,
+          {
+            method: "DELETE",
+          }
       );
 
       if (!response.ok) {
@@ -63,7 +65,7 @@ function BeneficiaryList() {
       }
 
       setBeneficiaries(
-        beneficiaries.filter((beneficiary) => beneficiary.id !== id)
+          beneficiaries.filter((beneficiary) => beneficiary.id !== id)
       );
     } catch (error) {
       setError(error.message);
@@ -71,66 +73,70 @@ function BeneficiaryList() {
   }
 
   return (
-    <div className="page">
-      <PageHeader
-        title="Beneficiaries"
-        description="Payment beneficiaries linked to customer accounts."
-        action={
-          <Button as={Link} to="/beneficiaries/add">
-            <Plus size={16} /> Add Beneficiary
-          </Button>
-        }
-      />
-
-      <Banner variant="error">{error}</Banner>
-
-      {loading ? (
-        <LoadingState label="Loading beneficiaries..." />
-      ) : beneficiaries.length === 0 ? (
-        <EmptyState
-          title="No beneficiaries yet"
-          description="Add a beneficiary to enable transfers."
-        />
-      ) : (
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Account Number</th>
-                <th>Bank Name</th>
-                <th>IFSC Code</th>
-                <th>Customer ID</th>
-                <th></th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {beneficiaries.map((beneficiary) => (
-                <tr key={beneficiary.id}>
-                  <td className="num">{beneficiary.id}</td>
-                  <td>{beneficiary.name}</td>
-                  <td className="num">{beneficiary.accountNumber}</td>
-                  <td>{beneficiary.bankName}</td>
-                  <td className="num">{beneficiary.ifscCode}</td>
-                  <td className="num">{beneficiary.customerId}</td>
-                  <td>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => handleDelete(beneficiary.id)}
-                    >
-                      <Trash2 size={14} /> Delete
+      <div className="page">
+        <PageHeader
+            title="Beneficiaries"
+            description="Payment beneficiaries linked to customer accounts."
+            action={
+                hasRole("MAKER") && (
+                    <Button as={Link} to="/beneficiaries/add">
+                      <Plus size={16} /> Add Beneficiary
                     </Button>
-                  </td>
+                )
+            }
+        />
+
+        <Banner variant="error">{error}</Banner>
+
+        {loading ? (
+            <LoadingState label="Loading beneficiaries..." />
+        ) : beneficiaries.length === 0 ? (
+            <EmptyState
+                title="No beneficiaries yet"
+                description="Add a beneficiary to enable transfers."
+            />
+        ) : (
+            <div className="table-wrap">
+              <table>
+                <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Account Number</th>
+                  <th>Bank Name</th>
+                  <th>IFSC Code</th>
+                  <th>Customer ID</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+                </thead>
+
+                <tbody>
+                {beneficiaries.map((beneficiary) => (
+                    <tr key={beneficiary.id}>
+                      <td className="num">{beneficiary.id}</td>
+                      <td>{beneficiary.name}</td>
+                      <td className="num">{beneficiary.accountNumber}</td>
+                      <td>{beneficiary.bankName}</td>
+                      <td className="num">{beneficiary.ifscCode}</td>
+                      <td className="num">{beneficiary.customerId}</td>
+                      <td>
+                        {(hasRole("ADMIN") || hasRole("CHECKER")) && (
+                            <Button
+                                variant="danger"
+                                size="sm"
+                                onClick={() => handleDelete(beneficiary.id)}
+                            >
+                              <Trash2 size={14} /> Delete
+                            </Button>
+                        )}
+                      </td>
+                    </tr>
+                ))}
+                </tbody>
+              </table>
+            </div>
+        )}
+      </div>
   );
 }
 

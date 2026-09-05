@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API_BASE_URL, { parseErrorMessage } from "../services/api";
+import API_BASE_URL, { parseErrorMessage, authFetch } from "../services/api";
 import PageHeader from "../components/ui/PageHeader";
 import Card from "../components/ui/Card";
 import FormField from "../components/ui/FormField";
@@ -24,7 +24,7 @@ function CreateAccount() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/customers`)
+    authFetch(`${API_BASE_URL}/api/customers`)
         .then((response) => {
           if (!response.ok) {
             throw new Error("Failed to load customers");
@@ -95,7 +95,7 @@ function CreateAccount() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/accounts`, {
+      const response = await authFetch(`${API_BASE_URL}/api/accounts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

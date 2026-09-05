@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import API_BASE_URL, { parseErrorMessage } from "../services/api";
+import API_BASE_URL, { parseErrorMessage, authFetch } from "../services/api";
 import { formatCurrency } from "../utils/format";
 import PageHeader from "../components/ui/PageHeader";
 import Card from "../components/ui/Card";
@@ -12,12 +12,13 @@ import LoadingState from "../components/ui/LoadingState";
 import EmptyState from "../components/ui/EmptyState";
 import { ArrowLeft } from "lucide-react";
 import Badge from "../components/ui/Badge";
+import { useAuth } from "../auth/AuthContext";
 
 function TransactionHistory() {
+  const { hasRole } = useAuth();
   const { id } = useParams();
   const [transactions, setTransactions] = useState([]);
 
-  // Updated initial state to match Spring Boot Enum constraints
   const [formData, setFormData] = useState({
     type: "DEPOSIT",
     amount: "",
@@ -35,7 +36,7 @@ function TransactionHistory() {
     try {
       setLoading(true);
       setError("");
-      const response = await fetch(
+      const response = await authFetch(
           `${API_BASE_URL}/api/accounts/${id}/transactions`
       );
 
@@ -65,7 +66,7 @@ function TransactionHistory() {
     setMessage("");
 
     try {
-      const response = await fetch(
+      const response = await authFetch(
           `${API_BASE_URL}/api/accounts/${id}/transactions`,
           {
             method: "POST",
@@ -88,7 +89,6 @@ function TransactionHistory() {
 
       setMessage("Transaction created successfully!");
 
-      // Form reset matches Backend Enum values
       setFormData({
         type: "DEPOSIT",
         amount: "",
@@ -112,40 +112,42 @@ function TransactionHistory() {
             }
         />
 
-        <Card title="Create Transaction" style={{ maxWidth: 480, marginBottom: "var(--space-5)" }}>
-          <Banner variant="error">{error}</Banner>
-          <Banner variant="success">{message}</Banner>
+        {hasRole("MAKER") && (
+            <Card title="Create Transaction" style={{ maxWidth: 480, marginBottom: "var(--space-5)" }}>
+              <Banner variant="error">{error}</Banner>
+              <Banner variant="success">{message}</Banner>
 
-          <form onSubmit={handleSubmit}>
-            <FormField label="Type" htmlFor="type">
-              <select
-                  id="type"
-                  className="input"
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-              >
-                {/* Option values strictly match backend Enum [DEPOSIT, WITHDRAWAL] */}
-                <option value="DEPOSIT">Deposit (Credit)</option>
-                <option value="WITHDRAWAL">Withdrawal (Debit)</option>
-              </select>
-            </FormField>
+              <form onSubmit={handleSubmit}>
+                <FormField label="Type" htmlFor="type">
+                  <select
+                      id="type"
+                      className="input"
+                      name="type"
+                      value={formData.type}
+                      onChange={handleChange}
+                  >
+                    {/* Option values strictly match backend Enum [DEPOSIT, WITHDRAWAL] */}
+                    <option value="DEPOSIT">Deposit (Credit)</option>
+                    <option value="WITHDRAWAL">Withdrawal (Debit)</option>
+                  </select>
+                </FormField>
 
-            <FormField label="Amount" htmlFor="amount">
-              <Input
-                  id="amount"
-                  type="number"
-                  name="amount"
-                  value={formData.amount}
-                  onChange={handleChange}
-                  min="1"
-                  required
-              />
-            </FormField>
+                <FormField label="Amount" htmlFor="amount">
+                  <Input
+                      id="amount"
+                      type="number"
+                      name="amount"
+                      value={formData.amount}
+                      onChange={handleChange}
+                      min="1"
+                      required
+                  />
+                </FormField>
 
-            <Button type="submit">Create Transaction</Button>
-          </form>
-        </Card>
+                <Button type="submit">Create Transaction</Button>
+              </form>
+            </Card>
+        )}
 
         <h2>Transactions</h2>
 

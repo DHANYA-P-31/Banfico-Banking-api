@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
-import { Landmark, Users, Wallet, Contact } from "lucide-react";
+import { Landmark, Users, Wallet, Contact, LogOut } from "lucide-react";
+import { useAuth } from "../auth/AuthContext";
 
 const links = [
   { to: "/customers", label: "Customers", icon: Users },
@@ -8,37 +9,65 @@ const links = [
 ];
 
 function Navbar() {
+  const { username, logout } = useAuth();
+
   return (
-    <header className="appbar">
-      <div className="appbar-inner">
-        <NavLink to="/" className="appbar-brand">
+      <header className="appbar">
+        <div className="appbar-inner">
+          <NavLink to="/" className="appbar-brand">
           <span className="mark">
             <Landmark size={13} strokeWidth={2.5} />
           </span>
-          Our Bank
-        </NavLink>
+            Our Bank
+          </NavLink>
 
-        <nav className="appbar-links">
-          {links.map((link) => {
-            const Icon = link.icon;
-            return (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) =>
-                  isActive ? "appbar-link active" : "appbar-link"
-                }
-              >
+          <nav className="appbar-links">
+            {links.map((link) => {
+              const Icon = link.icon;
+              return (
+                  <NavLink
+                      key={link.to}
+                      to={link.to}
+                      className={({ isActive }) =>
+                          isActive ? "appbar-link active" : "appbar-link"
+                      }
+                  >
                 <span className="row" style={{ gap: "var(--space-2)" }}>
                   <Icon size={15} strokeWidth={2} />
                   {link.label}
                 </span>
-              </NavLink>
-            );
-          })}
-        </nav>
-      </div>
-    </header>
+                  </NavLink>
+              );
+            })}
+          </nav>
+
+          <div className="row" style={{ gap: "var(--space-3)" }}>
+            {username && (
+                <span
+                    className="text-faint"
+                    style={{ fontSize: 13 }}
+                >
+              {username}
+            </span>
+            )}
+            <button
+                className="appbar-link"
+                onClick={logout}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "var(--space-2)",
+                }}
+            >
+              <LogOut size={15} strokeWidth={2} />
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
   );
 }
 

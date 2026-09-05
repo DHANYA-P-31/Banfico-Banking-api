@@ -29,7 +29,6 @@ function CreateCustomer() {
       [name]: value,
     });
 
-    // Remove the error for this field
     setErrors({
       ...errors,
       [name]: "",
