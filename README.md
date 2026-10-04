@@ -64,6 +64,38 @@ Run:
 docker run -p 8080:8080 banking-api
 ```
 
+### Full stack through the Nginx gateway
+
+The full local stack is exposed through Nginx on port `8080`. Nginx is the
+single browser entry point and routes requests to the internal services:
+
+| URL | Destination |
+|---|---|
+| `http://localhost:8080/` | Frontend |
+| `http://localhost:8080/api/*` | Backend API |
+| `http://localhost:8080/auth/*` | Keycloak |
+
+Start the complete stack from the repository root:
+
+```powershell
+./mvnw.cmd clean package -DskipTests
+docker compose up --build -d
+```
+
+The PostgreSQL data is persisted in the `postgres-data` volume. Keycloak
+imports `keycloak/realm-export.json` on first startup. The gateway publishes
+basic access and error logs in `nginx/logs/` and they can also be viewed with:
+
+```powershell
+docker compose logs -f gateway
+```
+
+To stop the stack:
+
+```powershell
+docker compose down
+```
+
 ## APIs
 
 ### Health Check
