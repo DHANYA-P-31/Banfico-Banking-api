@@ -13,6 +13,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/banfico
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8081/realms/our-bank
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://banking-keycloak:8080/realms/our-bank/protocol/openid-connect/certs
 
   frontend:
     build:
