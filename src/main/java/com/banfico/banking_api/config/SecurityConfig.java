@@ -66,6 +66,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/beneficiaries")
                         .authenticated()
 
+                        .requestMatchers(HttpMethod.POST, "/api/consents")
+                        .hasAnyRole("ADMIN", "MAKER")
+
+                        .requestMatchers(HttpMethod.GET, "/api/consents")
+                        .authenticated()
+
+                        .requestMatchers(HttpMethod.PUT, "/api/consents/*/approve",
+                                "/api/consents/*/reject")
+                        .hasAnyRole("ADMIN", "CHECKER")
+
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

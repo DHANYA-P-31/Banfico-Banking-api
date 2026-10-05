@@ -98,6 +98,23 @@ docker compose down
 
 ## APIs
 
+### Consent management
+
+Authenticated users can create and review requests for a third party to access
+customer account data:
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/consents` | Create a pending consent request |
+| GET | `/api/consents` | List consent requests |
+| GET | `/api/consents/{id}` | View one consent request |
+| PUT | `/api/consents/{id}/approve` | Approve a pending request |
+| PUT | `/api/consents/{id}/reject` | Reject a pending request |
+
+Consent requests contain a customer, account, third-party name, data scope,
+expiry date, and status (`PENDING`, `APPROVED`, or `REJECTED`). `MAKER` users
+create requests; `CHECKER` or `ADMIN` users approve or reject them.
+
 ### Health Check
 
 ```

@@ -67,4 +67,16 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(response);
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleConflict(
+            IllegalStateException exception) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", 409);
+        response.put("error", "Conflict");
+        response.put("message", exception.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
 }

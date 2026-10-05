@@ -1,11 +1,12 @@
 import { NavLink } from "react-router-dom";
-import { Landmark, Users, Wallet, Contact, LogOut } from "lucide-react";
+import { Landmark, Users, Wallet, Contact, ShieldCheck, LogOut } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 
 const links = [
   { to: "/customers", label: "Customers", icon: Users },
   { to: "/accounts", label: "Accounts", icon: Wallet },
   { to: "/beneficiaries", label: "Beneficiaries", icon: Contact },
+  { to: "/consents", label: "Consents", icon: ShieldCheck },
 ];
 
 function Navbar() {

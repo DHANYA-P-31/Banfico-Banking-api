@@ -15,6 +15,7 @@ import TransactionHistory from "./pages/TransactionHistory";
 
 import BeneficiaryList from "./pages/BeneficiaryList";
 import AddBeneficiary from "./pages/AddBeneficiary";
+import ConsentList from "./pages/ConsentList";
 
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
@@ -56,6 +57,7 @@ function App() {
 
             <Route path="/beneficiaries" element={<BeneficiaryList />} />
             <Route path="/beneficiaries/add" element={<AddBeneficiary />} />
+            <Route path="/consents" element={<ConsentList />} />
 
             <Route path="/" element={<Home />} />
             <Route path="*" element={<NotFound />} />

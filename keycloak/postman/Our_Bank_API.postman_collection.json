@@ -1,1438 +1,1615 @@
 {
-  "info": {
-    "name": "Our Bank API",
-    "description": "Covers Weeks 1-4: customer/account/beneficiary/transaction CRUD, Keycloak token acquisition, and role-based access control testing (ADMIN/MAKER/CHECKER). Run the 'Auth - Get Tokens' folder first (or run the whole collection top to bottom) so later requests have valid tokens in the environment.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "item": [
-    {
-      "name": "Auth - Get Tokens",
-      "description": "Run these first. Each saves its access token into the environment (admin_token, maker_token, checker_token, viewer_token) for use by every other request.",
-      "item": [
-        {
-          "name": "Get Admin Token (admin1)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const body = pm.response.json();",
-                  "pm.environment.set('admin_token', body.access_token);",
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test('Received an access token', function () {",
-                  "    pm.expect(body.access_token).to.be.a('string');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/x-www-form-urlencoded"
-              }
-            ],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "client_id",
-                  "value": "{{client_id}}",
-                  "type": "text"
-                },
-                {
-                  "key": "grant_type",
-                  "value": "password",
-                  "type": "text"
-                },
-                {
-                  "key": "username",
-                  "value": "admin1",
-                  "type": "text"
-                },
-                {
-                  "key": "password",
-                  "value": "Admin@123",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
-              "host": [
-                "{{keycloak_url}}"
-              ],
-              "path": [
-                "realms",
-                "{{realm}}",
-                "protocol",
-                "openid-connect",
-                "token"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Maker Token (maker1)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const body = pm.response.json();",
-                  "pm.environment.set('maker_token', body.access_token);",
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test('Received an access token', function () {",
-                  "    pm.expect(body.access_token).to.be.a('string');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/x-www-form-urlencoded"
-              }
-            ],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "client_id",
-                  "value": "{{client_id}}",
-                  "type": "text"
-                },
-                {
-                  "key": "grant_type",
-                  "value": "password",
-                  "type": "text"
-                },
-                {
-                  "key": "username",
-                  "value": "maker1",
-                  "type": "text"
-                },
-                {
-                  "key": "password",
-                  "value": "Maker@123",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
-              "host": [
-                "{{keycloak_url}}"
-              ],
-              "path": [
-                "realms",
-                "{{realm}}",
-                "protocol",
-                "openid-connect",
-                "token"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Checker Token (checker1)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const body = pm.response.json();",
-                  "pm.environment.set('checker_token', body.access_token);",
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test('Received an access token', function () {",
-                  "    pm.expect(body.access_token).to.be.a('string');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/x-www-form-urlencoded"
-              }
-            ],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "client_id",
-                  "value": "{{client_id}}",
-                  "type": "text"
-                },
-                {
-                  "key": "grant_type",
-                  "value": "password",
-                  "type": "text"
-                },
-                {
-                  "key": "username",
-                  "value": "checker1",
-                  "type": "text"
-                },
-                {
-                  "key": "password",
-                  "value": "Checker@123",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
-              "host": [
-                "{{keycloak_url}}"
-              ],
-              "path": [
-                "realms",
-                "{{realm}}",
-                "protocol",
-                "openid-connect",
-                "token"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Viewer Token (viewer1 - no role)",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const body = pm.response.json();",
-                  "pm.environment.set('viewer_token', body.access_token);",
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test('Received an access token', function () {",
-                  "    pm.expect(body.access_token).to.be.a('string');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/x-www-form-urlencoded"
-              }
-            ],
-            "body": {
-              "mode": "urlencoded",
-              "urlencoded": [
-                {
-                  "key": "client_id",
-                  "value": "{{client_id}}",
-                  "type": "text"
-                },
-                {
-                  "key": "grant_type",
-                  "value": "password",
-                  "type": "text"
-                },
-                {
-                  "key": "username",
-                  "value": "viewer1",
-                  "type": "text"
-                },
-                {
-                  "key": "password",
-                  "value": "Viewer@123",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
-              "host": [
-                "{{keycloak_url}}"
-              ],
-              "path": [
-                "realms",
-                "{{realm}}",
-                "protocol",
-                "openid-connect",
-                "token"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Health (Public)",
-      "item": [
-        {
-          "name": "GET /health",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/health",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "health"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "GET /api/health",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/health",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "health"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "GET /api/health/database",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/health/database",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "health",
-                "database"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "GET /api/info",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/info",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "info"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Customers",
-      "item": [
-        {
-          "name": "Create Customer (ADMIN)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/customers",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "customers"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Test Customer\",\n  \"email\": \"test.customer@example.com\",\n  \"phoneNumber\": \"9876543210\",\n  \"address\": \"123 Test Street\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 201', function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});",
-                  "const body = pm.response.json();",
-                  "pm.environment.set('customer_id', body.id);"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Create Customer as VIEWER - expect 403",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{viewer_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/customers",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "customers"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Should Fail\",\n  \"email\": \"fail@example.com\",\n  \"phoneNumber\": \"1111111111\",\n  \"address\": \"N/A\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 403', function () {",
-                  "    pm.response.to.have.status(403);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Get All Customers (any valid token)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{viewer_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/customers",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "customers"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Get Customer By ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{viewer_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/customers/{{customer_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "customers",
-                "{{customer_id}}"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Update Customer (ADMIN)",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/customers/{{customer_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "customers",
-                "{{customer_id}}"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Test Customer Updated\",\n  \"email\": \"test.customer@example.com\",\n  \"phoneNumber\": \"9876543210\",\n  \"address\": \"456 Updated Street\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Delete Customer as MAKER - expect 403",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{maker_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/customers/{{customer_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "customers",
-                "{{customer_id}}"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 403', function () {",
-                  "    pm.response.to.have.status(403);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Accounts",
-      "item": [
-        {
-          "name": "Create Account (ADMIN)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/accounts",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "accounts"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"accountNumber\": \"ACC-TEST-001\",\n  \"accountType\": \"SAVINGS\",\n  \"balance\": 5000,\n  \"customerId\": \"{{customer_id}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 201', function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});",
-                  "const body = pm.response.json();",
-                  "pm.environment.set('account_id', body.id);"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Create Account as MAKER - expect 403",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{maker_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/accounts",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "accounts"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"accountNumber\": \"ACC-TEST-002\",\n  \"accountType\": \"SAVINGS\",\n  \"balance\": 0,\n  \"customerId\": \"{{customer_id}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 403', function () {",
-                  "    pm.response.to.have.status(403);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Get All Accounts (any valid token)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{viewer_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/accounts",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "accounts"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Get Account By ID",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{viewer_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/accounts/{{account_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "accounts",
-                "{{account_id}}"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Update Account (ADMIN)",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/accounts/{{account_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "accounts",
-                "{{account_id}}"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"accountNumber\": \"ACC-TEST-001\",\n  \"accountType\": \"CURRENT\",\n  \"balance\": 5000,\n  \"customerId\": \"{{customer_id}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Get Accounts with NO token - expect 401",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/accounts",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "accounts"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 401', function () {",
-                  "    pm.response.to.have.status(401);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Transactions",
-      "item": [
-        {
-          "name": "Create Deposit (MAKER)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{maker_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/accounts/{{account_id}}/transactions",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "accounts",
-                "{{account_id}}",
-                "transactions"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"type\": \"DEPOSIT\",\n  \"amount\": 1000,\n  \"transactionDate\": \"2026-01-01T10:00:00\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 201', function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Create Transaction as VIEWER - expect 403",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{viewer_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/accounts/{{account_id}}/transactions",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "accounts",
-                "{{account_id}}",
-                "transactions"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"type\": \"DEPOSIT\",\n  \"amount\": 100,\n  \"transactionDate\": \"2026-01-01T10:00:00\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 403', function () {",
-                  "    pm.response.to.have.status(403);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Create Withdrawal exceeding balance (MAKER) - expect 400 with real message",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{maker_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/accounts/{{account_id}}/transactions",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "accounts",
-                "{{account_id}}",
-                "transactions"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"type\": \"WITHDRAWAL\",\n  \"amount\": 999999999,\n  \"transactionDate\": \"2026-01-01T10:00:00\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 400', function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "pm.test('Error body has a message field', function () {",
-                  "    pm.expect(pm.response.json().message).to.be.a('string');",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Get Transaction History (any valid token)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{viewer_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/accounts/{{account_id}}/transactions",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "accounts",
-                "{{account_id}}",
-                "transactions"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Beneficiaries",
-      "item": [
-        {
-          "name": "Add Beneficiary (MAKER)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{maker_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/beneficiaries",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "beneficiaries"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Test Beneficiary\",\n  \"accountNumber\": \"1234567890\",\n  \"bankName\": \"Test Bank\",\n  \"ifscCode\": \"TEST0001234\",\n  \"customerId\": \"{{customer_id}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 201', function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});",
-                  "const body = pm.response.json();",
-                  "pm.environment.set('beneficiary_id', body.id);"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Add Beneficiary as VIEWER - expect 403",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{viewer_token}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/beneficiaries",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "beneficiaries"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Should Fail\",\n  \"accountNumber\": \"0000000000\",\n  \"bankName\": \"Fail Bank\",\n  \"ifscCode\": \"FAIL0000000\",\n  \"customerId\": \"{{customer_id}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 403', function () {",
-                  "    pm.response.to.have.status(403);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Get All Beneficiaries (any valid token)",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{viewer_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/beneficiaries",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "beneficiaries"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Delete Beneficiary as MAKER - expect 403",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{maker_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/beneficiaries/{{beneficiary_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "beneficiaries",
-                "{{beneficiary_id}}"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 403', function () {",
-                  "    pm.response.to.have.status(403);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Delete Beneficiary (CHECKER)",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{checker_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/beneficiaries/{{beneficiary_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "beneficiaries",
-                "{{beneficiary_id}}"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Cleanup",
-      "description": "Run last - removes the test account and customer created above.",
-      "item": [
-        {
-          "name": "Delete Test Account (ADMIN)",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/accounts/{{account_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "accounts",
-                "{{account_id}}"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Delete Test Customer (ADMIN)",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/api/customers/{{customer_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "customers",
-                "{{customer_id}}"
-              ]
-            }
-          },
-          "response": [],
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Status is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    }
-  ]
+    "info":  {
+                 "name":  "Our Bank API",
+                 "description":  "Covers customer, account, beneficiary, transaction, and consent-management APIs with Keycloak authentication and role-based access control.",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+             },
+    "item":  [
+                 {
+                     "name":  "Auth - Get Tokens",
+                     "description":  "Run these first. Each saves its access token into the environment (admin_token, maker_token, checker_token, viewer_token) for use by every other request.",
+                     "item":  [
+                                  {
+                                      "name":  "Get Admin Token (admin1)",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "const body = pm.response.json();",
+                                                                                    "pm.environment.set(\u0027admin_token\u0027, body.access_token);",
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "pm.test(\u0027Received an access token\u0027, function () {",
+                                                                                    "    pm.expect(body.access_token).to.be.a(\u0027string\u0027);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/x-www-form-urlencoded"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "urlencoded",
+                                                                   "urlencoded":  [
+                                                                                      {
+                                                                                          "key":  "client_id",
+                                                                                          "value":  "{{client_id}}",
+                                                                                          "type":  "text"
+                                                                                      },
+                                                                                      {
+                                                                                          "key":  "grant_type",
+                                                                                          "value":  "password",
+                                                                                          "type":  "text"
+                                                                                      },
+                                                                                      {
+                                                                                          "key":  "username",
+                                                                                          "value":  "admin1",
+                                                                                          "type":  "text"
+                                                                                      },
+                                                                                      {
+                                                                                          "key":  "password",
+                                                                                          "value":  "Admin@123",
+                                                                                          "type":  "text"
+                                                                                      }
+                                                                                  ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
+                                                                  "host":  [
+                                                                               "{{keycloak_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "realms",
+                                                                               "{{realm}}",
+                                                                               "protocol",
+                                                                               "openid-connect",
+                                                                               "token"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Get Maker Token (maker1)",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "const body = pm.response.json();",
+                                                                                    "pm.environment.set(\u0027maker_token\u0027, body.access_token);",
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "pm.test(\u0027Received an access token\u0027, function () {",
+                                                                                    "    pm.expect(body.access_token).to.be.a(\u0027string\u0027);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/x-www-form-urlencoded"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "urlencoded",
+                                                                   "urlencoded":  [
+                                                                                      {
+                                                                                          "key":  "client_id",
+                                                                                          "value":  "{{client_id}}",
+                                                                                          "type":  "text"
+                                                                                      },
+                                                                                      {
+                                                                                          "key":  "grant_type",
+                                                                                          "value":  "password",
+                                                                                          "type":  "text"
+                                                                                      },
+                                                                                      {
+                                                                                          "key":  "username",
+                                                                                          "value":  "maker1",
+                                                                                          "type":  "text"
+                                                                                      },
+                                                                                      {
+                                                                                          "key":  "password",
+                                                                                          "value":  "Maker@123",
+                                                                                          "type":  "text"
+                                                                                      }
+                                                                                  ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
+                                                                  "host":  [
+                                                                               "{{keycloak_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "realms",
+                                                                               "{{realm}}",
+                                                                               "protocol",
+                                                                               "openid-connect",
+                                                                               "token"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Get Checker Token (checker1)",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "const body = pm.response.json();",
+                                                                                    "pm.environment.set(\u0027checker_token\u0027, body.access_token);",
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "pm.test(\u0027Received an access token\u0027, function () {",
+                                                                                    "    pm.expect(body.access_token).to.be.a(\u0027string\u0027);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/x-www-form-urlencoded"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "urlencoded",
+                                                                   "urlencoded":  [
+                                                                                      {
+                                                                                          "key":  "client_id",
+                                                                                          "value":  "{{client_id}}",
+                                                                                          "type":  "text"
+                                                                                      },
+                                                                                      {
+                                                                                          "key":  "grant_type",
+                                                                                          "value":  "password",
+                                                                                          "type":  "text"
+                                                                                      },
+                                                                                      {
+                                                                                          "key":  "username",
+                                                                                          "value":  "checker1",
+                                                                                          "type":  "text"
+                                                                                      },
+                                                                                      {
+                                                                                          "key":  "password",
+                                                                                          "value":  "Checker@123",
+                                                                                          "type":  "text"
+                                                                                      }
+                                                                                  ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
+                                                                  "host":  [
+                                                                               "{{keycloak_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "realms",
+                                                                               "{{realm}}",
+                                                                               "protocol",
+                                                                               "openid-connect",
+                                                                               "token"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  },
+                                  {
+                                      "name":  "Get Viewer Token (viewer1 - no role)",
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "const body = pm.response.json();",
+                                                                                    "pm.environment.set(\u0027viewer_token\u0027, body.access_token);",
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});",
+                                                                                    "pm.test(\u0027Received an access token\u0027, function () {",
+                                                                                    "    pm.expect(body.access_token).to.be.a(\u0027string\u0027);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ],
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/x-www-form-urlencoded"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "urlencoded",
+                                                                   "urlencoded":  [
+                                                                                      {
+                                                                                          "key":  "client_id",
+                                                                                          "value":  "{{client_id}}",
+                                                                                          "type":  "text"
+                                                                                      },
+                                                                                      {
+                                                                                          "key":  "grant_type",
+                                                                                          "value":  "password",
+                                                                                          "type":  "text"
+                                                                                      },
+                                                                                      {
+                                                                                          "key":  "username",
+                                                                                          "value":  "viewer1",
+                                                                                          "type":  "text"
+                                                                                      },
+                                                                                      {
+                                                                                          "key":  "password",
+                                                                                          "value":  "Viewer@123",
+                                                                                          "type":  "text"
+                                                                                      }
+                                                                                  ]
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{keycloak_url}}/realms/{{realm}}/protocol/openid-connect/token",
+                                                                  "host":  [
+                                                                               "{{keycloak_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "realms",
+                                                                               "{{realm}}",
+                                                                               "protocol",
+                                                                               "openid-connect",
+                                                                               "token"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Health (Public)",
+                     "item":  [
+                                  {
+                                      "name":  "GET /health",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/health",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "health"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "GET /api/health",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/health",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "health"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "GET /api/health/database",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/health/database",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "health",
+                                                                               "database"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "GET /api/info",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/info",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "info"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Customers",
+                     "item":  [
+                                  {
+                                      "name":  "Create Customer (ADMIN)",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{admin_token}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/customers",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "customers"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"name\": \"Test Customer\",\n  \"email\": \"test.customer@example.com\",\n  \"phoneNumber\": \"9876543210\",\n  \"address\": \"123 Test Street\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 201\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(201);",
+                                                                                    "});",
+                                                                                    "const body = pm.response.json();",
+                                                                                    "pm.environment.set(\u0027customer_id\u0027, body.id);"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Create Customer as VIEWER - expect 403",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{viewer_token}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/customers",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "customers"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"name\": \"Should Fail\",\n  \"email\": \"fail@example.com\",\n  \"phoneNumber\": \"1111111111\",\n  \"address\": \"N/A\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 403\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(403);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Get All Customers (any valid token)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{viewer_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/customers",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "customers"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Get Customer By ID",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{viewer_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/customers/{{customer_id}}",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "customers",
+                                                                               "{{customer_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Update Customer (ADMIN)",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{admin_token}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/customers/{{customer_id}}",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "customers",
+                                                                               "{{customer_id}}"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"name\": \"Test Customer Updated\",\n  \"email\": \"test.customer@example.com\",\n  \"phoneNumber\": \"9876543210\",\n  \"address\": \"456 Updated Street\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Delete Customer as MAKER - expect 403",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{maker_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/customers/{{customer_id}}",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "customers",
+                                                                               "{{customer_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 403\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(403);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Accounts",
+                     "item":  [
+                                  {
+                                      "name":  "Create Account (ADMIN)",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{admin_token}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/accounts",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "accounts"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"accountNumber\": \"ACC-TEST-001\",\n  \"accountType\": \"SAVINGS\",\n  \"balance\": 5000,\n  \"customerId\": \"{{customer_id}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 201\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(201);",
+                                                                                    "});",
+                                                                                    "const body = pm.response.json();",
+                                                                                    "pm.environment.set(\u0027account_id\u0027, body.id);"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Create Account as MAKER - expect 403",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{maker_token}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/accounts",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "accounts"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"accountNumber\": \"ACC-TEST-002\",\n  \"accountType\": \"SAVINGS\",\n  \"balance\": 0,\n  \"customerId\": \"{{customer_id}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 403\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(403);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Get All Accounts (any valid token)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{viewer_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/accounts",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "accounts"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Get Account By ID",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{viewer_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/accounts/{{account_id}}",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "accounts",
+                                                                               "{{account_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Update Account (ADMIN)",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{admin_token}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/accounts/{{account_id}}",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "accounts",
+                                                                               "{{account_id}}"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"accountNumber\": \"ACC-TEST-001\",\n  \"accountType\": \"CURRENT\",\n  \"balance\": 5000,\n  \"customerId\": \"{{customer_id}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Get Accounts with NO token - expect 401",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/accounts",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "accounts"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 401\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(401);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Transactions",
+                     "item":  [
+                                  {
+                                      "name":  "Create Deposit (MAKER)",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{maker_token}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/accounts/{{account_id}}/transactions",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "accounts",
+                                                                               "{{account_id}}",
+                                                                               "transactions"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"type\": \"DEPOSIT\",\n  \"amount\": 1000,\n  \"transactionDate\": \"2026-01-01T10:00:00\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 201\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(201);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Create Transaction as VIEWER - expect 403",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{viewer_token}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/accounts/{{account_id}}/transactions",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "accounts",
+                                                                               "{{account_id}}",
+                                                                               "transactions"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"type\": \"DEPOSIT\",\n  \"amount\": 100,\n  \"transactionDate\": \"2026-01-01T10:00:00\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 403\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(403);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Create Withdrawal exceeding balance (MAKER) - expect 400 with real message",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{maker_token}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/accounts/{{account_id}}/transactions",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "accounts",
+                                                                               "{{account_id}}",
+                                                                               "transactions"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"type\": \"WITHDRAWAL\",\n  \"amount\": 999999999,\n  \"transactionDate\": \"2026-01-01T10:00:00\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 400\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(400);",
+                                                                                    "});",
+                                                                                    "pm.test(\u0027Error body has a message field\u0027, function () {",
+                                                                                    "    pm.expect(pm.response.json().message).to.be.a(\u0027string\u0027);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Get Transaction History (any valid token)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{viewer_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/accounts/{{account_id}}/transactions",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "accounts",
+                                                                               "{{account_id}}",
+                                                                               "transactions"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Beneficiaries",
+                     "item":  [
+                                  {
+                                      "name":  "Add Beneficiary (MAKER)",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{maker_token}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/beneficiaries",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "beneficiaries"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"name\": \"Test Beneficiary\",\n  \"accountNumber\": \"1234567890\",\n  \"bankName\": \"Test Bank\",\n  \"ifscCode\": \"TEST0001234\",\n  \"customerId\": \"{{customer_id}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 201\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(201);",
+                                                                                    "});",
+                                                                                    "const body = pm.response.json();",
+                                                                                    "pm.environment.set(\u0027beneficiary_id\u0027, body.id);"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Add Beneficiary as VIEWER - expect 403",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{viewer_token}}"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/beneficiaries",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "beneficiaries"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"name\": \"Should Fail\",\n  \"accountNumber\": \"0000000000\",\n  \"bankName\": \"Fail Bank\",\n  \"ifscCode\": \"FAIL0000000\",\n  \"customerId\": \"{{customer_id}}\"\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 403\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(403);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Get All Beneficiaries (any valid token)",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{viewer_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/beneficiaries",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "beneficiaries"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Delete Beneficiary as MAKER - expect 403",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{maker_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/beneficiaries/{{beneficiary_id}}",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "beneficiaries",
+                                                                               "{{beneficiary_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 403\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(403);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Delete Beneficiary (CHECKER)",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{checker_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/beneficiaries/{{beneficiary_id}}",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "beneficiaries",
+                                                                               "{{beneficiary_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Cleanup",
+                     "description":  "Run last - removes the test account and customer created above.",
+                     "item":  [
+                                  {
+                                      "name":  "Delete Test Account (ADMIN)",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{admin_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/accounts/{{account_id}}",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "accounts",
+                                                                               "{{account_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Delete Test Customer (ADMIN)",
+                                      "request":  {
+                                                      "method":  "DELETE",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "Bearer {{admin_token}}"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/customers/{{customer_id}}",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "customers",
+                                                                               "{{customer_id}}"
+                                                                           ]
+                                                              }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\u0027Status is 200\u0027, function () {",
+                                                                                    "    pm.response.to.have.status(200);",
+                                                                                    "});"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  }
+                              ]
+                 },
+                 {
+                     "name":  "Consents",
+                     "item":  [
+                                  {
+                                      "name":  "Create Consent (MAKER)",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "******"
+                                                                     },
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\"customerId\":1,\"accountId\":1,\"thirdPartyName\":\"FinanceApp\",\"dataScope\":\"accounts,transactions\",\"expiresAt\":\"2030-01-01T00:00:00\"}"
+                                                               },
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/consents",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "consents"
+                                                                           ]
+                                                              }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "List Consents",
+                                      "request":  {
+                                                      "method":  "GET",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "******"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/consents",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "consents"
+                                                                           ]
+                                                              }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Approve Consent (CHECKER)",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "******"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/consents/{{consent_id}}/approve",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "consents",
+                                                                               "{{consent_id}}",
+                                                                               "approve"
+                                                                           ]
+                                                              }
+                                                  }
+                                  },
+                                  {
+                                      "name":  "Reject Consent (CHECKER)",
+                                      "request":  {
+                                                      "method":  "PUT",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Authorization",
+                                                                         "value":  "******"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{base_url}}/api/consents/{{consent_id}}/reject",
+                                                                  "host":  [
+                                                                               "{{base_url}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "consents",
+                                                                               "{{consent_id}}",
+                                                                               "reject"
+                                                                           ]
+                                                              }
+                                                  }
+                                  }
+                              ]
+                 }
+             ]
 }
