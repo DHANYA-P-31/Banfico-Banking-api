@@ -4,7 +4,7 @@ A full-stack banking platform and Open Banking consent management system built w
 
 ---
 
-## 🚀 Architecture Overview
+## Architecture Overview
 
 The system uses a single-entry Nginx Reverse Proxy Gateway routing all client traffic:
 
@@ -34,10 +34,10 @@ The system uses a single-entry Nginx Reverse Proxy Gateway routing all client tr
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
-- **Backend**: Java 21, Spring Boot 3.x, Spring Data JPA, Spring Security (OAuth2 Resource Server / JWT)
-- **Frontend**: React 18, Vite, React Router v6, Keycloak JS SDK, Vanilla CSS
+- **Backend**: Java 21, Spring Boot 3.x, Spring Data JPA, Spring Security 
+- **Frontend**: React 18, Vite, React Router v6, Keycloak JS SDK, CSS
 - **Identity & Access**: Keycloak 26.x (OpenID Connect / OAuth 2.0)
 - **Database**: PostgreSQL 16
 - **Gateway & Infrastructure**: Nginx 1.27 Alpine, Docker & Docker Compose
@@ -45,7 +45,7 @@ The system uses a single-entry Nginx Reverse Proxy Gateway routing all client tr
 
 ---
 
-## 🔐 Role-Based Access Control (RBAC)
+## Role-Based Access Control (RBAC)
 
 Authentication is handled via JWT tokens issued by Keycloak (`our-bank` realm). The API enforces role-based authorization across four key roles:
 
@@ -58,7 +58,7 @@ Authentication is handled via JWT tokens issued by Keycloak (`our-bank` realm). 
 
 ---
 
-## 💻 Prerequisites
+## Prerequisites
 
 - **Java 21 JDK**
 - **Docker & Docker Compose** (v2.0+)
@@ -67,7 +67,7 @@ Authentication is handled via JWT tokens issued by Keycloak (`our-bank` realm). 
 
 ---
 
-## 🚀 Quick Start (Docker Compose)
+## Quick Start (Docker Compose)
 
 To start the complete full-stack environment including PostgreSQL, Keycloak, Backend API, Frontend, and Nginx Gateway:
 
@@ -83,7 +83,7 @@ To start the complete full-stack environment including PostgreSQL, Keycloak, Bac
 
 3. **Access Application:**
    - **Frontend App**: [http://localhost:8080](http://localhost:8080)
-   - **Keycloak Admin Console**: [http://localhost:8080/auth/admin](http://localhost:8080/auth/admin) (User: `admin` / Password: `admin`)
+   - **Keycloak Admin Console**: [http://localhost:8080/auth/admin](http://localhost:8080/auth/admin) 
    - **Backend API Health**: [http://localhost:8080/api/health](http://localhost:8080/api/health)
 
 4. **Stop stack:**
@@ -93,7 +93,7 @@ To start the complete full-stack environment including PostgreSQL, Keycloak, Bac
 
 ---
 
-## ⚡ Local Development Setup
+## Local Development Setup
 
 ### Database & Security Container Setup
 
@@ -121,9 +121,9 @@ npm run dev
 
 ---
 
-## 📡 API Reference
+## API Reference
 
-### 🏥 Health & System Info
+### Health & System Info
 
 | Method | Endpoint | Description | Auth Required |
 |---|---|---|---|
@@ -134,7 +134,7 @@ npm run dev
 
 ---
 
-### 👤 Customer Self-Service (`/api/me`)
+### Customer Self-Service (`/api/me`)
 
 Endpoints for logged-in bank customers (`CUSTOMER` role):
 
@@ -155,7 +155,7 @@ Endpoints for logged-in bank customers (`CUSTOMER` role):
 
 ---
 
-### 👥 Customer Management (`/api/customers`)
+### Customer Management (`/api/customers`)
 
 | Method | Endpoint | Description | Allowed Roles |
 |---|---|---|---|
@@ -168,7 +168,7 @@ Endpoints for logged-in bank customers (`CUSTOMER` role):
 
 ---
 
-### 🏦 Bank Accounts (`/api/accounts`)
+### Bank Accounts (`/api/accounts`)
 
 | Method | Endpoint | Description | Allowed Roles |
 |---|---|---|---|
@@ -181,7 +181,7 @@ Endpoints for logged-in bank customers (`CUSTOMER` role):
 
 ---
 
-### 💸 Transactions (`/api/accounts/{accountId}/transactions`)
+### Transactions (`/api/accounts/{accountId}/transactions`)
 
 | Method | Endpoint | Description | Allowed Roles |
 |---|---|---|---|
@@ -190,7 +190,7 @@ Endpoints for logged-in bank customers (`CUSTOMER` role):
 
 ---
 
-### 🤝 Beneficiaries (`/api/beneficiaries`)
+### Beneficiaries (`/api/beneficiaries`)
 
 | Method | Endpoint | Description | Allowed Roles |
 |---|---|---|---|
@@ -200,7 +200,7 @@ Endpoints for logged-in bank customers (`CUSTOMER` role):
 
 ---
 
-### 📜 Open Banking Consents (`/api/consents`)
+### Open Banking Consents (`/api/consents`)
 
 | Method | Endpoint | Description | Allowed Roles |
 |---|---|---|---|
@@ -213,7 +213,7 @@ Endpoints for logged-in bank customers (`CUSTOMER` role):
 
 ---
 
-## 🗄️ Project Structure
+## Project Structure
 
 ```
 banking-api/
@@ -243,7 +243,7 @@ banking-api/
 
 ---
 
-## 🧪 Validation and Error Handling
+## Validation and Error Handling
 
 The API uses Jakarta Bean Validation for incoming requests and formats consistent error payloads:
 
@@ -254,7 +254,3 @@ The API uses Jakarta Bean Validation for incoming requests and formats consisten
 - `404 Not Found` - Resource non-existent
 
 ---
-
-## 📄 License
-
-Developed for Banfico Training Program. All rights reserved.
