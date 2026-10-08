@@ -11,27 +11,33 @@ import com.banfico.banking_api.repository.CustomerRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.math.BigDecimal;
+import java.util.UUID;
 
 @Service
 public class BankAccountServiceImpl implements BankAccountService {
 
     private final BankAccountRepository bankAccountRepository;
     private final CustomerRepository customerRepository;
+    private final AuditService auditService;
 
     public BankAccountServiceImpl(
             BankAccountRepository bankAccountRepository,
-            CustomerRepository customerRepository) {
+            CustomerRepository customerRepository,
+            AuditService auditService) {
 
         this.bankAccountRepository = bankAccountRepository;
         this.customerRepository = customerRepository;
+        this.auditService = auditService;
     }
 
     @Override
     public BankAccountResponse createAccount(
             BankAccountRequest request) {
 
-        if (bankAccountRepository
-                .existsByAccountNumber(request.getAccountNumber())) {
+        if (request.getAccountNumber() != null
+                && !request.getAccountNumber().isBlank()
+                && bankAccountRepository.existsByAccountNumber(request.getAccountNumber())) {
 
             throw new IllegalArgumentException(
                     "Account number already exists");
@@ -46,13 +52,20 @@ public class BankAccountServiceImpl implements BankAccountService {
 
         BankAccount account = new BankAccount();
 
-        account.setAccountNumber(request.getAccountNumber());
+        account.setAccountNumber(request.getAccountNumber() == null || request.getAccountNumber().isBlank()
+                ? "PENDING-" + UUID.randomUUID()
+                : request.getAccountNumber());
         account.setAccountType(request.getAccountType());
-        account.setBalance(request.getBalance());
+        account.setBalance(request.getBalance() == null ? BigDecimal.ZERO : request.getBalance());
         account.setCustomer(customer);
 
         BankAccount savedAccount =
                 bankAccountRepository.save(account);
+        if (request.getAccountNumber() == null || request.getAccountNumber().isBlank()) {
+            savedAccount.setAccountNumber(String.format("100%09d", savedAccount.getId()));
+            savedAccount = bankAccountRepository.save(savedAccount);
+        }
+        auditService.record("ACCOUNT_CREATED", customer.getId(), "ACCOUNT", savedAccount.getId());
 
         return mapToResponse(savedAccount);
     }
@@ -96,10 +109,7 @@ public class BankAccountServiceImpl implements BankAccountService {
                                 "Customer not found with id: "
                                         + request.getCustomerId()));
 
-        account.setAccountNumber(request.getAccountNumber());
         account.setAccountType(request.getAccountType());
-        account.setBalance(request.getBalance());
-        account.setCustomer(customer);
 
         BankAccount updatedAccount =
                 bankAccountRepository.save(account);
@@ -119,15 +129,37 @@ public class BankAccountServiceImpl implements BankAccountService {
         bankAccountRepository.deleteById(id);
     }
 
+    @Override
+    public BankAccountResponse closeAccount(Long id) {
+        BankAccount account = bankAccountRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found with id: " + id));
+        if (account.getStatus() == com.banfico.banking_api.entity.AccountStatus.CLOSED) {
+            throw new IllegalStateException("Account is already closed");
+        }
+        account.setStatus(com.banfico.banking_api.entity.AccountStatus.CLOSED);
+        BankAccount closed = bankAccountRepository.save(account);
+        auditService.record("ACCOUNT_CLOSED", closed.getCustomer().getId(), "ACCOUNT", closed.getId());
+        return mapToResponse(closed);
+    }
+
     private BankAccountResponse mapToResponse(
             BankAccount account) {
+
+        String custIdStr = account.getCustomer() != null && account.getCustomer().getId() != null
+                ? String.valueOf(account.getCustomer().getId())
+                : null;
+        String custNum = account.getCustomer() != null
+                ? account.getCustomer().getCustomerNumber()
+                : null;
 
         return new BankAccountResponse(
                 account.getId(),
                 account.getAccountNumber(),
                 account.getAccountType(),
                 account.getBalance(),
-                account.getCustomer().getId()
+                custIdStr,
+                custNum,
+                account.getStatus() == null ? null : account.getStatus().name()
         );
     }
 }

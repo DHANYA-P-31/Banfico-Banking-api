@@ -2,6 +2,7 @@ package com.banfico.banking_api.controller;
 
 import com.banfico.banking_api.dto.CustomerRequest;
 import com.banfico.banking_api.dto.CustomerResponse;
+import com.banfico.banking_api.dto.OnlineBankingActivationRequest;
 import com.banfico.banking_api.service.CustomerService;
 
 import jakarta.validation.Valid;
@@ -68,5 +69,18 @@ public class CustomerController {
         customerService.deleteCustomer(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/online-banking")
+    public ResponseEntity<CustomerResponse> activateOnlineBanking(
+            @PathVariable Long id,
+            @Valid @RequestBody OnlineBankingActivationRequest request) {
+        return ResponseEntity.ok(map(customerService.activateOnlineBanking(id, request.getKeycloakUserId())));
+    }
+
+    private CustomerResponse map(com.banfico.banking_api.entity.Customer customer) {
+        return new CustomerResponse(customer.getId(), customer.getName(), customer.getEmail(),
+                customer.getPhoneNumber(), customer.getAddress(), customer.getCustomerNumber(),
+                customer.getStatus() == null ? null : customer.getStatus().name());
     }
 }

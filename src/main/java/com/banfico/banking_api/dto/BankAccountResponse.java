@@ -8,7 +8,9 @@ public class BankAccountResponse {
     private String accountNumber;
     private String accountType;
     private BigDecimal balance;
-    private Long customerId;
+    private String customerId;
+    private String customerNumber;
+    private String status;
 
     public BankAccountResponse() {
     }
@@ -18,13 +20,36 @@ public class BankAccountResponse {
             String accountNumber,
             String accountType,
             BigDecimal balance,
-            Long customerId) {
+            String customerId) {
+        this(id, accountNumber, accountType, balance, customerId, null, null);
+    }
+
+    public BankAccountResponse(
+            Long id,
+            String accountNumber,
+            String accountType,
+            BigDecimal balance,
+            String customerId,
+            String status) {
+        this(id, accountNumber, accountType, balance, customerId, null, status);
+    }
+
+    public BankAccountResponse(
+            Long id,
+            String accountNumber,
+            String accountType,
+            BigDecimal balance,
+            String customerId,
+            String customerNumber,
+            String status) {
 
         this.id = id;
         this.accountNumber = accountNumber;
         this.accountType = accountType;
         this.balance = balance;
         this.customerId = customerId;
+        this.customerNumber = customerNumber;
+        this.status = status;
     }
 
     public Long getId() {
@@ -59,11 +84,27 @@ public class BankAccountResponse {
         this.balance = balance;
     }
 
-    public Long getCustomerId() {
+    public String getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(String customerId) {
         this.customerId = customerId;
+    }
+
+    public String getCustomerNumber() {
+        return customerNumber;
+    }
+
+    public void setCustomerNumber(String customerNumber) {
+        this.customerNumber = customerNumber;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

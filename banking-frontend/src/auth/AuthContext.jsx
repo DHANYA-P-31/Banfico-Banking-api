@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
 
         keycloak
             .init({
-                onLoad: "login-required",
+                onLoad: "check-sso",
                 pkceMethod: "S256",
                 checkLoginIframe: false,
             })
@@ -35,12 +35,15 @@ export function AuthProvider({ children }) {
     }, []);
 
     const hasRole = (role) => keycloak.hasRealmRole(role);
+    const login = () => keycloak.login({ redirectUri: window.location.origin });
 
     const value = {
         initialized,
         authenticated,
         username: keycloak.tokenParsed?.preferred_username,
         hasRole,
+        login,
+        keycloak,
         logout: () => keycloak.logout({ redirectUri: window.location.origin }),
     };
 

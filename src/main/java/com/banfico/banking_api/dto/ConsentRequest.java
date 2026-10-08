@@ -7,8 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public class ConsentRequest {
-    @NotNull(message = "Customer ID is required")
     private Long customerId;
+    private String customerNumber;
     @NotNull(message = "Account ID is required")
     private Long accountId;
     @NotBlank(message = "Third-party name is required")
@@ -22,6 +22,8 @@ public class ConsentRequest {
     public ConsentRequest() {}
     public Long getCustomerId() { return customerId; }
     public void setCustomerId(Long customerId) { this.customerId = customerId; }
+    public String getCustomerNumber() { return customerNumber; }
+    public void setCustomerNumber(String customerNumber) { this.customerNumber = customerNumber; }
     public Long getAccountId() { return accountId; }
     public void setAccountId(Long accountId) { this.accountId = accountId; }
     public String getThirdPartyName() { return thirdPartyName; }
@@ -31,3 +33,4 @@ public class ConsentRequest {
     public LocalDateTime getExpiresAt() { return expiresAt; }
     public void setExpiresAt(LocalDateTime expiresAt) { this.expiresAt = expiresAt; }
 }
+

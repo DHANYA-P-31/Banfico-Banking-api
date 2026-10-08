@@ -26,6 +26,11 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8080/auth/realms/our-bank
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/auth/realms/our-bank/protocol/openid-connect/certs
+      KEYCLOAK_ADMIN_SERVER_URL: http://keycloak:8080/auth
+      KEYCLOAK_ADMIN_REALM: our-bank
+      KEYCLOAK_ADMIN_USERNAME: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN_CLIENT_ID: admin-cli
 
   frontend:
     build:
@@ -53,6 +58,8 @@ services:
       POSTGRES_DB: banfico
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
 

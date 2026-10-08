@@ -2,15 +2,23 @@ import { NavLink } from "react-router-dom";
 import { Landmark, Users, Wallet, Contact, ShieldCheck, LogOut } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
 
-const links = [
+const employeeLinks = [
   { to: "/customers", label: "Customers", icon: Users },
   { to: "/accounts", label: "Accounts", icon: Wallet },
   { to: "/beneficiaries", label: "Beneficiaries", icon: Contact },
   { to: "/consents", label: "Consents", icon: ShieldCheck },
 ];
 
+const customerLinks = [
+  { to: "/customer/dashboard", label: "Dashboard", icon: Landmark },
+  { to: "/customer/accounts", label: "My Accounts", icon: Wallet },
+  { to: "/customer/beneficiaries", label: "Beneficiaries", icon: Contact },
+  { to: "/customer/consents", label: "Consents", icon: ShieldCheck },
+];
+
 function Navbar() {
-  const { username, logout } = useAuth();
+  const { username, logout, hasRole } = useAuth();
+  const links = hasRole("CUSTOMER") ? customerLinks : employeeLinks;
 
   return (
       <header className="appbar">
@@ -44,12 +52,20 @@ function Navbar() {
 
           <div className="row" style={{ gap: "var(--space-3)" }}>
             {username && (
-                <span
-                    className="text-faint"
-                    style={{ fontSize: 13 }}
-                >
-              {username}
-            </span>
+                hasRole("CUSTOMER") ? (
+                    <NavLink
+                        to="/customer/profile"
+                        className="appbar-link"
+                        style={{ fontSize: 13, fontWeight: 600, color: "var(--color-primary, #2563eb)" }}
+                        title="View Profile"
+                    >
+                      {username}
+                    </NavLink>
+                ) : (
+                    <span className="text-faint" style={{ fontSize: 13 }}>
+                      {username}
+                    </span>
+                )
             )}
             <button
                 className="appbar-link"

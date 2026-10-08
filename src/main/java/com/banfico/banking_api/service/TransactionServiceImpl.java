@@ -43,6 +43,9 @@ public class TransactionServiceImpl
                         new ResourceNotFoundException(
                                 "Account not found with id: "
                                         + accountId));
+        if (account.getStatus() == com.banfico.banking_api.entity.AccountStatus.CLOSED) {
+            throw new IllegalStateException("Closed accounts cannot be transacted");
+        }
 
         BigDecimal currentBalance = account.getBalance();
         BigDecimal amount = request.getAmount();
@@ -113,7 +116,8 @@ public class TransactionServiceImpl
                 transaction.getType(),
                 transaction.getAmount(),
                 transaction.getTransactionDate(),
-                transaction.getAccount().getId()
+                transaction.getAccount().getId(),
+                transaction.getAccount().getAccountNumber()
         );
     }
 }

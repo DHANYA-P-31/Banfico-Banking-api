@@ -21,6 +21,16 @@ public class Customer {
 
     private String address;
 
+    @Column(unique = true)
+    private String customerNumber;
+
+    @Column(unique = true)
+    private String keycloakUserId;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private CustomerStatus status = CustomerStatus.PENDING_ACTIVATION;
+
     public Customer() {
     }
 
@@ -69,5 +79,29 @@ public class Customer {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getCustomerNumber() {
+        return customerNumber;
+    }
+
+    public void setCustomerNumber(String customerNumber) {
+        this.customerNumber = customerNumber;
+    }
+
+    public String getKeycloakUserId() {
+        return keycloakUserId;
+    }
+
+    public void setKeycloakUserId(String keycloakUserId) {
+        this.keycloakUserId = keycloakUserId;
+    }
+
+    public CustomerStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CustomerStatus status) {
+        this.status = status;
     }
 }

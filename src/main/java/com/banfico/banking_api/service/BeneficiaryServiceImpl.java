@@ -18,18 +18,25 @@ public class BeneficiaryServiceImpl
 
     private final BeneficiaryRepository beneficiaryRepository;
     private final CustomerRepository customerRepository;
+    private final AuditService auditService;
 
     public BeneficiaryServiceImpl(
             BeneficiaryRepository beneficiaryRepository,
-            CustomerRepository customerRepository) {
+            CustomerRepository customerRepository,
+            AuditService auditService) {
 
         this.beneficiaryRepository = beneficiaryRepository;
         this.customerRepository = customerRepository;
+        this.auditService = auditService;
     }
 
     @Override
     public BeneficiaryResponse createBeneficiary(
             BeneficiaryRequest request) {
+
+        if (request.getCustomerId() == null) {
+            throw new IllegalArgumentException("Customer ID is required");
+        }
 
         Customer customer = customerRepository
                 .findById(request.getCustomerId())
@@ -51,6 +58,7 @@ public class BeneficiaryServiceImpl
 
         Beneficiary savedBeneficiary =
                 beneficiaryRepository.save(beneficiary);
+        auditService.record("BENEFICIARY_CREATED", customer.getId(), "BENEFICIARY", savedBeneficiary.getId());
 
         return mapToResponse(savedBeneficiary);
     }
@@ -75,7 +83,10 @@ public class BeneficiaryServiceImpl
             );
         }
 
-        beneficiaryRepository.deleteById(id);
+        Beneficiary beneficiary = beneficiaryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Beneficiary not found with id: " + id));
+        beneficiaryRepository.delete(beneficiary);
+        auditService.record("BENEFICIARY_DELETED", beneficiary.getCustomer().getId(), "BENEFICIARY", id);
     }
 
     private BeneficiaryResponse mapToResponse(
@@ -87,7 +98,8 @@ public class BeneficiaryServiceImpl
                 beneficiary.getAccountNumber(),
                 beneficiary.getBankName(),
                 beneficiary.getIfscCode(),
-                beneficiary.getCustomer().getId()
+                beneficiary.getCustomer().getId(),
+                beneficiary.getCustomer().getCustomerNumber()
         );
     }
 }

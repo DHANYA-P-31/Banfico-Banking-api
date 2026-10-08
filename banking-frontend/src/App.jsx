@@ -19,6 +19,34 @@ import ConsentList from "./pages/ConsentList";
 
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
+import CustomerDashboard from "./pages/CustomerDashboard";
+import CustomerAccounts from "./pages/CustomerAccounts";
+import CustomerTransactions from "./pages/CustomerTransactions";
+import CustomerProfile from "./pages/CustomerProfile";
+import CustomerBeneficiaries from "./pages/CustomerBeneficiaries";
+import CustomerConsents from "./pages/CustomerConsents";
+import EditCustomer from "./pages/EditCustomer";
+import LoginPage from "./pages/LoginPage";
+
+function CustomerRoute({ children }) {
+  const { hasRole } = useAuth();
+  return hasRole("CUSTOMER") ? children : <NotFound />;
+}
+
+function EmployeeRoute({ children }) {
+  const { hasRole } = useAuth();
+  return hasRole("ADMIN") || hasRole("MAKER") || hasRole("CHECKER") ? children : <NotFound />;
+}
+
+function AdminRoute({ children }) {
+  const { hasRole } = useAuth();
+  return hasRole("ADMIN") ? children : <NotFound />;
+}
+
+function LandingRoute() {
+  const { hasRole } = useAuth();
+  return hasRole("CUSTOMER") ? <CustomerDashboard /> : <Home />;
+}
 
 function App() {
   const { initialized, authenticated } = useAuth();
@@ -31,11 +59,7 @@ function App() {
   }
 
   if (!authenticated) {
-    return (
-        <div className="page">
-          <LoadingState label="Redirecting to login..." />
-        </div>
-    );
+    return <LoginPage />;
   }
 
   return (
@@ -44,22 +68,29 @@ function App() {
           <Navbar />
 
           <Routes>
-            <Route path="/customers" element={<CustomerList />} />
-            <Route path="/customers/create" element={<CreateCustomer />} />
+            <Route path="/customer/dashboard" element={<CustomerRoute><CustomerDashboard /></CustomerRoute>} />
+            <Route path="/customer/accounts" element={<CustomerRoute><CustomerAccounts /></CustomerRoute>} />
+            <Route path="/customer/accounts/:id/transactions" element={<CustomerRoute><CustomerTransactions /></CustomerRoute>} />
+            <Route path="/customer/profile" element={<CustomerRoute><CustomerProfile /></CustomerRoute>} />
+            <Route path="/customer/beneficiaries" element={<CustomerRoute><CustomerBeneficiaries /></CustomerRoute>} />
+            <Route path="/customer/consents" element={<CustomerRoute><CustomerConsents /></CustomerRoute>} />
+            <Route path="/customers" element={<EmployeeRoute><CustomerList /></EmployeeRoute>} />
+            <Route path="/customers/create" element={<AdminRoute><CreateCustomer /></AdminRoute>} />
+            <Route path="/customers/:id/edit" element={<AdminRoute><EditCustomer /></AdminRoute>} />
 
-            <Route path="/accounts" element={<AccountList />} />
-            <Route path="/accounts/create" element={<CreateAccount />} />
-            <Route path="/accounts/:id" element={<AccountDetails />} />
+            <Route path="/accounts" element={<EmployeeRoute><AccountList /></EmployeeRoute>} />
+            <Route path="/accounts/create" element={<EmployeeRoute><CreateAccount /></EmployeeRoute>} />
+            <Route path="/accounts/:id" element={<EmployeeRoute><AccountDetails /></EmployeeRoute>} />
             <Route
                 path="/accounts/:id/transactions"
-                element={<TransactionHistory />}
+                element={<EmployeeRoute><TransactionHistory /></EmployeeRoute>}
             />
 
-            <Route path="/beneficiaries" element={<BeneficiaryList />} />
-            <Route path="/beneficiaries/add" element={<AddBeneficiary />} />
-            <Route path="/consents" element={<ConsentList />} />
+            <Route path="/beneficiaries" element={<EmployeeRoute><BeneficiaryList /></EmployeeRoute>} />
+            <Route path="/beneficiaries/add" element={<EmployeeRoute><AddBeneficiary /></EmployeeRoute>} />
+            <Route path="/consents" element={<EmployeeRoute><ConsentList /></EmployeeRoute>} />
 
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<LandingRoute />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </ErrorBoundary>

@@ -21,6 +21,10 @@ public class BankAccount {
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal balance;
 
+    @Enumerated(EnumType.STRING)
+    @Column
+    private AccountStatus status = AccountStatus.ACTIVE;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
@@ -66,5 +70,13 @@ public class BankAccount {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public AccountStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(AccountStatus status) {
+        this.status = status;
     }
 }

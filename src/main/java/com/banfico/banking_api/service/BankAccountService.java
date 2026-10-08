@@ -18,4 +18,6 @@ public interface BankAccountService {
             BankAccountRequest request);
 
     void deleteAccount(Long id);
+
+    BankAccountResponse closeAccount(Long id);
 }

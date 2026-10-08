@@ -36,8 +36,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/customers/*")
                         .hasRole("ADMIN")
 
+                        .requestMatchers(HttpMethod.PUT, "/api/customers/*/online-banking")
+                        .hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.GET, "/api/customers", "/api/customers/*")
-                        .authenticated()
+                        .hasAnyRole("ADMIN", "MAKER", "CHECKER")
+
+                        .requestMatchers("/api/me/**")
+                        .hasRole("CUSTOMER")
 
                         .requestMatchers(HttpMethod.POST, "/api/accounts")
                         .hasRole("ADMIN")
@@ -48,14 +54,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/accounts/*")
                         .hasRole("ADMIN")
 
+                        .requestMatchers(HttpMethod.PUT, "/api/accounts/*/close")
+                        .hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.GET, "/api/accounts", "/api/accounts/*")
-                        .authenticated()
+                        .hasAnyRole("ADMIN", "MAKER", "CHECKER")
 
                         .requestMatchers(HttpMethod.POST, "/api/accounts/*/transactions")
                         .hasRole("MAKER")
 
                         .requestMatchers(HttpMethod.GET, "/api/accounts/*/transactions")
-                        .authenticated()
+                        .hasAnyRole("ADMIN", "MAKER", "CHECKER")
 
                         .requestMatchers(HttpMethod.POST, "/api/beneficiaries")
                         .hasRole("MAKER")
@@ -64,16 +73,19 @@ public class SecurityConfig {
                         .hasAnyRole("ADMIN", "CHECKER")
 
                         .requestMatchers(HttpMethod.GET, "/api/beneficiaries")
-                        .authenticated()
+                        .hasAnyRole("ADMIN", "MAKER", "CHECKER")
 
                         .requestMatchers(HttpMethod.POST, "/api/consents")
                         .hasAnyRole("ADMIN", "MAKER")
 
-                        .requestMatchers(HttpMethod.GET, "/api/consents")
-                        .authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/consents", "/api/consents/*")
+                        .hasAnyRole("ADMIN", "MAKER", "CHECKER")
 
                         .requestMatchers(HttpMethod.PUT, "/api/consents/*/approve",
                                 "/api/consents/*/reject")
+                        .hasAnyRole("ADMIN", "CHECKER")
+
+                        .requestMatchers(HttpMethod.PUT, "/api/consents/*/revoke")
                         .hasAnyRole("ADMIN", "CHECKER")
 
                         .anyRequest().authenticated()

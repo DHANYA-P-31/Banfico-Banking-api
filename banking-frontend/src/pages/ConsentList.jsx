@@ -12,6 +12,8 @@ function ConsentList() {
   const canCreate = hasRole("ADMIN") || hasRole("MAKER");
   const canDecide = hasRole("ADMIN") || hasRole("CHECKER");
   const [consents, setConsents] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [accounts, setAccounts] = useState([]);
   const [form, setForm] = useState({
     customerId: "",
     accountId: "",
@@ -24,8 +26,33 @@ function ConsentList() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    loadConsents();
+    loadData();
   }, []);
+
+  async function loadData() {
+    try {
+      setLoading(true);
+      const [consentsRes, customersRes, accountsRes] = await Promise.all([
+        authFetch(`${API_BASE_URL}/api/consents`),
+        canCreate ? authFetch(`${API_BASE_URL}/api/customers`) : Promise.resolve(null),
+        canCreate ? authFetch(`${API_BASE_URL}/api/accounts`) : Promise.resolve(null),
+      ]);
+
+      if (!consentsRes.ok) throw new Error(await parseErrorMessage(consentsRes, "Unable to load consents."));
+      setConsents(await consentsRes.json());
+
+      if (customersRes && customersRes.ok) {
+        setCustomers(await customersRes.json());
+      }
+      if (accountsRes && accountsRes.ok) {
+        setAccounts(await accountsRes.json());
+      }
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function loadConsents() {
     try {
@@ -34,8 +61,6 @@ function ConsentList() {
       setConsents(await response.json());
     } catch (e) {
       setError(e.message);
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -44,17 +69,21 @@ function ConsentList() {
     setError("");
     setMessage("");
     try {
+      const selectedCust = customers.find((c) => String(c.id) === String(form.customerId));
       const response = await authFetch(`${API_BASE_URL}/api/consents`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...form,
           customerId: Number(form.customerId),
+          customerNumber: selectedCust?.customerNumber || "",
           accountId: Number(form.accountId),
+          thirdPartyName: form.thirdPartyName,
+          dataScope: form.dataScope,
+          expiresAt: form.expiresAt,
         }),
       });
       if (!response.ok) throw new Error(await parseErrorMessage(response, "Unable to create consent."));
-      setMessage("Consent request created.");
+      setMessage("Consent request created successfully.");
       setForm({ customerId: "", accountId: "", thirdPartyName: "", dataScope: "accounts,transactions", expiresAt: "" });
       await loadConsents();
     } catch (e) {
@@ -73,6 +102,17 @@ function ConsentList() {
     }
   }
 
+  const selectedCust = customers.find((c) => String(c.id) === String(form.customerId));
+
+  const availableAccounts = form.customerId
+    ? accounts.filter(
+        (acc) =>
+          String(acc.customerId) === String(form.customerId) ||
+          (selectedCust?.customerNumber &&
+            String(acc.customerNumber || acc.customerId) === String(selectedCust.customerNumber))
+      )
+    : [];
+
   return (
     <div className="page">
       <PageHeader title="Consents" description="Manage third-party access to customer account data." />
@@ -82,28 +122,112 @@ function ConsentList() {
         <form onSubmit={createConsent} className="card" style={{ marginBottom: "var(--space-6)" }}>
           <h3>Create consent request</h3>
           <div className="grid-2">
-            <input required type="number" placeholder="Customer ID" value={form.customerId} onChange={(e) => setForm({ ...form, customerId: e.target.value })} />
-            <input required type="number" placeholder="Account ID" value={form.accountId} onChange={(e) => setForm({ ...form, accountId: e.target.value })} />
-            <input required placeholder="Third-party name" value={form.thirdPartyName} onChange={(e) => setForm({ ...form, thirdPartyName: e.target.value })} />
-            <input required placeholder="Data scope" value={form.dataScope} onChange={(e) => setForm({ ...form, dataScope: e.target.value })} />
-            <input required type="datetime-local" value={form.expiresAt} onChange={(e) => setForm({ ...form, expiresAt: e.target.value })} />
+            <div>
+              <label style={{ display: "block", marginBottom: "4px", fontSize: "0.85rem", fontWeight: 600 }}>Select Customer</label>
+              <select
+                required
+                value={form.customerId}
+                onChange={(e) => setForm({ ...form, customerId: e.target.value, accountId: "" })}
+              >
+                <option value="">-- Choose Customer --</option>
+                {customers.map((cust) => (
+                  <option key={cust.id} value={cust.id}>
+                    {cust.name} {cust.customerNumber ? `(${cust.customerNumber})` : `(ID: ${cust.id})`}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: "block", marginBottom: "4px", fontSize: "0.85rem", fontWeight: 600 }}>Select Account</label>
+              <select
+                required
+                disabled={!form.customerId}
+                value={form.accountId}
+                onChange={(e) => setForm({ ...form, accountId: e.target.value })}
+              >
+                <option value="">-- {form.customerId ? "Choose Account" : "Select Customer First"} --</option>
+                {availableAccounts.map((acc) => (
+                  <option key={acc.id} value={acc.id}>
+                    {acc.accountNumber} ({acc.accountType})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: "block", marginBottom: "4px", fontSize: "0.85rem", fontWeight: 600 }}>Third-Party Application Name</label>
+              <input
+                required
+                placeholder="e.g. Plaid, QuickBooks, Mint"
+                value={form.thirdPartyName}
+                onChange={(e) => setForm({ ...form, thirdPartyName: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", marginBottom: "4px", fontSize: "0.85rem", fontWeight: 600 }}>Data Scope</label>
+              <input
+                required
+                placeholder="Data scope (e.g. accounts,transactions)"
+                value={form.dataScope}
+                onChange={(e) => setForm({ ...form, dataScope: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", marginBottom: "4px", fontSize: "0.85rem", fontWeight: 600 }}>Expiration Date & Time</label>
+              <input
+                required
+                type="datetime-local"
+                value={form.expiresAt}
+                onChange={(e) => setForm({ ...form, expiresAt: e.target.value })}
+              />
+            </div>
           </div>
-          <Button type="submit">Create Consent</Button>
+          <Button type="submit" style={{ marginTop: "1rem" }}>Create Consent</Button>
         </form>
       )}
-      {loading ? <LoadingState label="Loading consents..." /> : consents.length === 0 ? <EmptyState title="No consent requests" description="Create a request to share account data with a third party." /> : (
+      {loading ? (
+        <LoadingState label="Loading consents..." />
+      ) : consents.length === 0 ? (
+        <EmptyState title="No consent requests" description="Create a request to share account data with a third party." />
+      ) : (
         <div className="table-wrap">
           <table>
-            <thead><tr><th>ID</th><th>Customer</th><th>Account</th><th>Third party</th><th>Scope</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody>{consents.map((consent) => (
-              <tr key={consent.id}>
-                <td>{consent.id}</td><td>{consent.customerId}</td><td>{consent.accountId}</td>
-                <td>{consent.thirdPartyName}</td><td>{consent.dataScope}</td><td>{consent.status}</td>
-                <td>{consent.status === "PENDING" && canDecide && (
-                  <span className="row"><Button size="sm" onClick={() => decide(consent.id, "approve")}>Approve</Button><Button size="sm" variant="danger" onClick={() => decide(consent.id, "reject")}>Reject</Button></span>
-                )}</td>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Customer Number</th>
+                <th>Customer Name</th>
+                <th>Account Number</th>
+                <th>Third Party</th>
+                <th>Scope</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}</tbody>
+            </thead>
+            <tbody>
+              {consents.map((consent) => (
+                <tr key={consent.id}>
+                  <td>{consent.id}</td>
+                  <td><strong>{consent.customerNumber || consent.customerId}</strong></td>
+                  <td>{consent.customerName || "-"}</td>
+                  <td><code>{consent.accountNumber || consent.accountId}</code></td>
+                  <td>{consent.thirdPartyName}</td>
+                  <td>{consent.dataScope}</td>
+                  <td>{consent.status}</td>
+                  <td>
+                    {consent.status === "PENDING" && canDecide && (
+                      <span className="row">
+                        <Button size="sm" onClick={() => decide(consent.id, "approve")}>Approve</Button>
+                        <Button size="sm" variant="danger" onClick={() => decide(consent.id, "reject")}>Reject</Button>
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
       )}
@@ -112,3 +236,4 @@ function ConsentList() {
 }
 
 export default ConsentList;
+

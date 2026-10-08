@@ -100,12 +100,11 @@ function BeneficiaryList() {
               <table>
                 <thead>
                 <tr>
-                  <th>ID</th>
                   <th>Name</th>
                   <th>Account Number</th>
                   <th>Bank Name</th>
                   <th>IFSC Code</th>
-                  <th>Customer ID</th>
+                  <th>Customer Number</th>
                   <th></th>
                 </tr>
                 </thead>
@@ -113,12 +112,11 @@ function BeneficiaryList() {
                 <tbody>
                 {beneficiaries.map((beneficiary) => (
                     <tr key={beneficiary.id}>
-                      <td className="num">{beneficiary.id}</td>
                       <td>{beneficiary.name}</td>
                       <td className="num">{beneficiary.accountNumber}</td>
                       <td>{beneficiary.bankName}</td>
                       <td className="num">{beneficiary.ifscCode}</td>
-                      <td className="num">{beneficiary.customerId}</td>
+                      <td className="num">{beneficiary.customerNumber || beneficiary.customerId}</td>
                       <td>
                         {(hasRole("ADMIN") || hasRole("CHECKER")) && (
                             <Button

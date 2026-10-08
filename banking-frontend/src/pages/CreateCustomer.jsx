@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API_BASE_URL, { parseErrorMessage } from "../services/api";
+import API_BASE_URL, { authFetch, parseErrorMessage } from "../services/api";
 import PageHeader from "../components/ui/PageHeader";
 import Card from "../components/ui/Card";
 import FormField from "../components/ui/FormField";
@@ -19,6 +19,7 @@ function CreateCustomer() {
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [createdResult, setCreatedResult] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -36,6 +37,7 @@ function CreateCustomer() {
 
     setMessage("");
     setError("");
+    setCreatedResult(null);
   };
 
   const validateForm = () => {
@@ -71,13 +73,14 @@ function CreateCustomer() {
 
     setMessage("");
     setError("");
+    setCreatedResult(null);
 
     if (!validateForm()) {
       return;
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/customers`, {
+      const response = await authFetch(`${API_BASE_URL}/api/customers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -96,7 +99,9 @@ function CreateCustomer() {
         );
       }
 
-      setMessage("Customer created successfully!");
+      const data = await response.json();
+      setCreatedResult(data);
+      setMessage("Customer created successfully");
 
       setFormData({
         name: "",
@@ -119,12 +124,30 @@ function CreateCustomer() {
       <div className="page">
         <PageHeader
             title="Create Customer"
-            description="Add a new customer record."
+            description="Add a new customer record with automatic online banking identity."
         />
 
-        <Card style={{ maxWidth: 480 }}>
+        <Card style={{ maxWidth: 520 }}>
           <Banner variant="error">{error}</Banner>
           <Banner variant="success">{message}</Banner>
+
+          {createdResult && (
+              <div style={{
+                marginBottom: "1.5rem",
+                padding: "1rem",
+                borderRadius: "8px",
+                backgroundColor: "rgba(16, 185, 129, 0.08)",
+                border: "1px solid rgba(16, 185, 129, 0.2)"
+              }}>
+                <h4 style={{ margin: "0 0 0.5rem 0", color: "#10b981" }}>Created Account Summary</h4>
+                <p style={{ margin: "0.25rem 0" }}><strong>Customer ID:</strong> {createdResult.customerNumber || `CUST${String(createdResult.id).padStart(6, '0')}`}</p>
+                <p style={{ margin: "0.25rem 0" }}><strong>Status:</strong> {createdResult.status || "ACTIVE"}</p>
+                <p style={{ margin: "0.25rem 0" }}><strong>Online Banking:</strong> Enabled</p>
+                <p style={{ margin: "0.5rem 0 0 0", fontSize: "0.85rem", color: "#64748b" }}>
+                  Initial password provisioned server-side. The customer will be required to update their password upon first login.
+                </p>
+              </div>
+          )}
 
           <form onSubmit={handleSubmit}>
             <FormField label="Name" htmlFor="name" error={errors.name}>

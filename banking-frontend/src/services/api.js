@@ -1,6 +1,6 @@
 import keycloak from "../keycloak.js";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || window.location.origin;
 
 export default API_BASE_URL;
 
@@ -22,10 +22,15 @@ export async function parseErrorMessage(response, fallback = "Something went wro
 }
 
 export async function authFetch(url, options = {}) {
+    if (!keycloak.authenticated || !keycloak.token) {
+        await keycloak.login({ redirectUri: window.location.href });
+        throw new Error("Authentication required. Redirecting to login...");
+    }
+
     try {
         await keycloak.updateToken(30);
     } catch (error) {
-        keycloak.login();
+        await keycloak.login({ redirectUri: window.location.href });
         throw new Error("Session expired. Redirecting to login...");
     }
 
@@ -34,5 +39,12 @@ export async function authFetch(url, options = {}) {
         Authorization: `Bearer ${keycloak.token}`,
     };
 
-    return fetch(url, { ...options, headers });
+    const response = await fetch(url, { ...options, headers });
+
+    if (response.status === 401) {
+        await keycloak.login({ redirectUri: window.location.href });
+        throw new Error("Session expired. Redirecting to login...");
+    }
+
+    return response;
 }
