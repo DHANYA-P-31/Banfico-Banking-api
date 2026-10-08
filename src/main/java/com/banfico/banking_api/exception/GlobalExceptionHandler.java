@@ -12,6 +12,16 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(CustomerAccessException.class)
+    public ResponseEntity<Map<String, Object>> handleCustomerAccess(
+            CustomerAccessException exception) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", 403);
+        response.put("error", exception.getMessage());
+        response.put("message", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(
             ResourceNotFoundException exception) {

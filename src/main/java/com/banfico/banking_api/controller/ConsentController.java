@@ -43,4 +43,9 @@ public class ConsentController {
     public ResponseEntity<ConsentResponse> reject(@PathVariable Long id) {
         return ResponseEntity.ok(consentService.rejectConsent(id));
     }
+
+    @PutMapping("/{id}/revoke")
+    public ResponseEntity<ConsentResponse> revoke(@PathVariable Long id) {
+        return ResponseEntity.ok(consentService.revokeConsent(id));
+    }
 }

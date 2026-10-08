@@ -73,4 +73,9 @@ public class BankAccountController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}/close")
+    public ResponseEntity<BankAccountResponse> closeAccount(@PathVariable Long id) {
+        return ResponseEntity.ok(bankAccountService.closeAccount(id));
+    }
 }
