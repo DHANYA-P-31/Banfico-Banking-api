@@ -20,6 +20,10 @@
       {
         "name": "CHECKER",
         "description": "Can approve/reject actions - delete beneficiaries alongside admin"
+      },
+      {
+        "name": "CUSTOMER",
+        "description": "Online banking access to the linked customer's data"
       }
     ]
   },
@@ -107,6 +111,20 @@
         }
       ],
       "realmRoles": []
+    },
+    {
+      "username": "customer1",
+      "enabled": true,
+      "email": "customer1@banking.test",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Customer@123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["CUSTOMER"]
     }
   ]
 }
