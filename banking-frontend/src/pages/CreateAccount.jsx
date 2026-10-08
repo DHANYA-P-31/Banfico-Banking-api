@@ -10,7 +10,6 @@ import Banner from "../components/ui/Banner";
 
 function CreateAccount() {
   const [formData, setFormData] = useState({
-    accountNumber: "",
     accountType: "",
     balance: "",
     customerId: "",
@@ -59,10 +58,6 @@ function CreateAccount() {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.accountNumber.trim()) {
-      newErrors.accountNumber = "Account number is required";
-    }
-
     if (!formData.accountType.trim()) {
       newErrors.accountType = "Account type is required";
     }
@@ -101,7 +96,6 @@ function CreateAccount() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          accountNumber: formData.accountNumber.trim(),
           accountType: formData.accountType.trim(),
           balance: Number(formData.balance),
           customerId: Number(formData.customerId),
@@ -119,7 +113,6 @@ function CreateAccount() {
       setMessage("Account created successfully!");
 
       setFormData({
-        accountNumber: "",
         accountType: "",
         balance: "",
         customerId: "",
@@ -147,21 +140,6 @@ function CreateAccount() {
           <Banner variant="success">{message}</Banner>
 
           <form onSubmit={handleSubmit}>
-            <FormField
-                label="Account Number"
-                htmlFor="accountNumber"
-                error={errors.accountNumber}
-            >
-              <Input
-                  id="accountNumber"
-                  type="text"
-                  name="accountNumber"
-                  value={formData.accountNumber}
-                  onChange={handleChange}
-                  error={errors.accountNumber}
-              />
-            </FormField>
-
             <FormField
                 label="Account Type"
                 htmlFor="accountType"

@@ -18,6 +18,7 @@ function TransactionHistory() {
   const { hasRole } = useAuth();
   const { id } = useParams();
   const [transactions, setTransactions] = useState([]);
+  const [account, setAccount] = useState(null);
 
   const [formData, setFormData] = useState({
     type: "DEPOSIT",
@@ -29,22 +30,28 @@ function TransactionHistory() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    fetchTransactions();
+    fetchAccountAndTransactions();
   }, [id]);
 
-  const fetchTransactions = async () => {
+  const fetchAccountAndTransactions = async () => {
     try {
       setLoading(true);
       setError("");
-      const response = await authFetch(
-          `${API_BASE_URL}/api/accounts/${id}/transactions`
-      );
 
-      if (!response.ok) {
+      const [txRes, accRes] = await Promise.all([
+        authFetch(`${API_BASE_URL}/api/accounts/${id}/transactions`),
+        authFetch(`${API_BASE_URL}/api/accounts/${id}`)
+      ]);
+
+      if (accRes.ok) {
+        setAccount(await accRes.json());
+      }
+
+      if (!txRes.ok) {
         throw new Error("Failed to fetch transactions");
       }
 
-      const data = await response.json();
+      const data = await txRes.json();
       setTransactions(data);
     } catch (error) {
       setError(error.message);
@@ -94,7 +101,7 @@ function TransactionHistory() {
         amount: "",
       });
 
-      fetchTransactions();
+      fetchAccountAndTransactions();
     } catch (error) {
       setError(error.message);
     }
@@ -104,7 +111,7 @@ function TransactionHistory() {
       <div className="page">
         <PageHeader
             title="Transaction History"
-            description={`Account ID ${id}`}
+            description={`Account Number: ${account?.accountNumber || transactions[0]?.accountNumber || id}`}
             action={
               <Button as={Link} to={`/accounts/${id}`} variant="secondary" size="sm">
                 <ArrowLeft size={14} /> Back to Account
@@ -126,7 +133,6 @@ function TransactionHistory() {
                       value={formData.type}
                       onChange={handleChange}
                   >
-                    {/* Option values strictly match backend Enum [DEPOSIT, WITHDRAWAL] */}
                     <option value="DEPOSIT">Deposit (Credit)</option>
                     <option value="WITHDRAWAL">Withdrawal (Debit)</option>
                   </select>
@@ -160,16 +166,14 @@ function TransactionHistory() {
               <table>
                 <thead>
                 <tr>
-                  <th>ID</th>
                   <th>Type</th>
                   <th>Amount</th>
                   <th>Date</th>
                 </tr>
                 </thead>
                 <tbody>
-                {transactions.map((transaction) => (
-                    <tr key={transaction.id}>
-                      <td className="num">{transaction.id}</td>
+                {transactions.map((transaction, idx) => (
+                    <tr key={transaction.id || idx}>
                       <td>
                         <Badge
                             variant={
@@ -190,7 +194,7 @@ function TransactionHistory() {
                         {formatCurrency(transaction.amount)}
                       </td>
                       <td className="text-muted">
-                        {new Date(transaction.transactionDate).toLocaleDateString()}
+                        {new Date(transaction.transactionDate).toLocaleString()}
                       </td>
                     </tr>
                 ))}

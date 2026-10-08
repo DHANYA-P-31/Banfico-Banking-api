@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import API_BASE_URL, { authFetch, parseErrorMessage } from "../services/api";
 import PageHeader from "../components/ui/PageHeader";
 import Card from "../components/ui/Card";
@@ -7,37 +7,75 @@ import FormField from "../components/ui/FormField";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 import Banner from "../components/ui/Banner";
+import LoadingState from "../components/ui/LoadingState";
+import { useAuth } from "../auth/AuthContext";
 
-function CreateCustomer() {
+function EditCustomer() {
+  const { id } = useParams();
+  const { hasRole } = useAuth();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phoneNumber: "",
     address: "",
+    customerNumber: "",
+    status: "ACTIVE"
   });
 
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [createdResult, setCreatedResult] = useState(null);
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!hasRole("ADMIN")) {
+      setError("Forbidden: Only ADMIN users can edit customer profiles.");
+      setLoading(false);
+      return;
+    }
+
+    fetchCustomer();
+  }, [id]);
+
+  const fetchCustomer = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const response = await authFetch(`${API_BASE_URL}/api/customers/${id}`);
+      if (!response.ok) {
+        throw new Error(await parseErrorMessage(response, "Failed to load customer profile."));
+      }
+      const data = await response.json();
+      setFormData({
+        name: data.name || "",
+        email: data.email || "",
+        phoneNumber: data.phoneNumber || "",
+        address: data.address || "",
+        customerNumber: data.customerNumber || `CUST${String(data.id).padStart(6, '0')}`,
+        status: data.status || "ACTIVE"
+      });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData({
       ...formData,
       [name]: value,
     });
-
     setErrors({
       ...errors,
       [name]: "",
     });
-
     setMessage("");
     setError("");
-    setCreatedResult(null);
   };
 
   const validateForm = () => {
@@ -55,8 +93,6 @@ function CreateCustomer() {
 
     if (!formData.phoneNumber.trim()) {
       newErrors.phoneNumber = "Phone number is required";
-    } else if (!/^\d{10}$/.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = "Phone number must contain exactly 10 digits";
     }
 
     if (!formData.address.trim()) {
@@ -64,24 +100,22 @@ function CreateCustomer() {
     }
 
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setMessage("");
     setError("");
-    setCreatedResult(null);
 
     if (!validateForm()) {
       return;
     }
 
     try {
-      const response = await authFetch(`${API_BASE_URL}/api/customers`, {
-        method: "POST",
+      setSubmitting(true);
+      const response = await authFetch(`${API_BASE_URL}/api/customers/${id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -90,66 +124,58 @@ function CreateCustomer() {
           email: formData.email.trim(),
           phoneNumber: formData.phoneNumber.trim(),
           address: formData.address.trim(),
+          status: formData.status
         }),
       });
 
       if (!response.ok) {
-        throw new Error(
-            await parseErrorMessage(response, "Unable to create customer.")
-        );
+        throw new Error(await parseErrorMessage(response, "Unable to update customer."));
       }
 
-      const data = await response.json();
-      setCreatedResult(data);
-      setMessage("Customer created successfully");
-
-      setFormData({
-        name: "",
-        email: "",
-        phoneNumber: "",
-        address: "",
-      });
-    } catch (error) {
-      if (error instanceof TypeError) {
-        setError(
-            "Unable to connect to the server. Please make sure the backend is running."
-        );
-      } else {
-        setError(error.message);
-      }
+      setMessage("Customer profile updated successfully.");
+      setTimeout(() => navigate("/customers"), 1200);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
     }
   };
+
+  if (loading) {
+    return <div className="page"><LoadingState label="Loading customer details..." /></div>;
+  }
+
+  if (!hasRole("ADMIN")) {
+    return (
+        <div className="page">
+          <Banner variant="error">Forbidden: Only ADMIN users can edit customer profiles.</Banner>
+        </div>
+    );
+  }
 
   return (
       <div className="page">
         <PageHeader
-            title="Create Customer"
-            description="Add a new customer record with automatic online banking identity."
+            title={`Edit Customer (${formData.customerNumber})`}
+            description="Update customer profile details."
         />
 
         <Card style={{ maxWidth: 520 }}>
           <Banner variant="error">{error}</Banner>
           <Banner variant="success">{message}</Banner>
 
-          {createdResult && (
-              <div style={{
-                marginBottom: "1.5rem",
-                padding: "1rem",
-                borderRadius: "8px",
-                backgroundColor: "rgba(16, 185, 129, 0.08)",
-                border: "1px solid rgba(16, 185, 129, 0.2)"
-              }}>
-                <h4 style={{ margin: "0 0 0.5rem 0", color: "#10b981" }}>Created Account Summary</h4>
-                <p style={{ margin: "0.25rem 0" }}><strong>Customer ID:</strong> {createdResult.customerNumber || `CUST${String(createdResult.id).padStart(6, '0')}`}</p>
-                <p style={{ margin: "0.25rem 0" }}><strong>Status:</strong> {createdResult.status || "ACTIVE"}</p>
-                <p style={{ margin: "0.25rem 0" }}><strong>Online Banking:</strong> Enabled</p>
-                <p style={{ margin: "0.5rem 0 0 0", fontSize: "0.85rem", color: "#64748b" }}>
-                  Initial password provisioned server-side. The customer will be required to update their password upon first login.
-                </p>
-              </div>
-          )}
-
           <form onSubmit={handleSubmit}>
+            <FormField label="Customer Number" htmlFor="customerNumber">
+              <Input
+                  id="customerNumber"
+                  type="text"
+                  value={formData.customerNumber}
+                  disabled
+                  readOnly
+                  style={{ backgroundColor: "#f8fafc" }}
+              />
+            </FormField>
+
             <FormField label="Name" htmlFor="name" error={errors.name}>
               <Input
                   id="name"
@@ -172,11 +198,7 @@ function CreateCustomer() {
               />
             </FormField>
 
-            <FormField
-                label="Phone"
-                htmlFor="phoneNumber"
-                error={errors.phoneNumber}
-            >
+            <FormField label="Phone Number" htmlFor="phoneNumber" error={errors.phoneNumber}>
               <Input
                   id="phoneNumber"
                   type="text"
@@ -199,7 +221,9 @@ function CreateCustomer() {
             </FormField>
 
             <div className="row">
-              <Button type="submit">Create Customer</Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? "Saving..." : "Save Changes"}
+              </Button>
               <Button
                   type="button"
                   variant="secondary"
@@ -214,4 +238,4 @@ function CreateCustomer() {
   );
 }
 
-export default CreateCustomer;
+export default EditCustomer;
