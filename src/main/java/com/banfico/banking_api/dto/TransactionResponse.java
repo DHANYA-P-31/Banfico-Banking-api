@@ -12,6 +12,7 @@ public class TransactionResponse {
     private BigDecimal amount;
     private LocalDateTime transactionDate;
     private Long accountId;
+    private String accountNumber;
 
     public TransactionResponse() {
     }
@@ -22,12 +23,23 @@ public class TransactionResponse {
             BigDecimal amount,
             LocalDateTime transactionDate,
             Long accountId) {
+        this(id, type, amount, transactionDate, accountId, null);
+    }
+
+    public TransactionResponse(
+            Long id,
+            TransactionType type,
+            BigDecimal amount,
+            LocalDateTime transactionDate,
+            Long accountId,
+            String accountNumber) {
 
         this.id = id;
         this.type = type;
         this.amount = amount;
         this.transactionDate = transactionDate;
         this.accountId = accountId;
+        this.accountNumber = accountNumber;
     }
 
     public Long getId() {
@@ -68,5 +80,13 @@ public class TransactionResponse {
 
     public void setAccountId(Long accountId) {
         this.accountId = accountId;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
     }
 }

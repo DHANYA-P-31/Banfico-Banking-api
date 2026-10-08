@@ -7,6 +7,8 @@ public class CustomerResponse {
     private String email;
     private String phoneNumber;
     private String address;
+    private String customerNumber;
+    private String status;
 
     public CustomerResponse() {
     }
@@ -17,12 +19,25 @@ public class CustomerResponse {
             String email,
             String phoneNumber,
             String address) {
+        this(id, name, email, phoneNumber, address, null, null);
+    }
+
+    public CustomerResponse(
+            Long id,
+            String name,
+            String email,
+            String phoneNumber,
+            String address,
+            String customerNumber,
+            String status) {
 
         this.id = id;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        this.customerNumber = customerNumber;
+        this.status = status;
     }
 
     public Long getId() {
@@ -63,5 +78,21 @@ public class CustomerResponse {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getCustomerNumber() {
+        return customerNumber;
+    }
+
+    public void setCustomerNumber(String customerNumber) {
+        this.customerNumber = customerNumber;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

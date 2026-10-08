@@ -8,6 +8,7 @@ public class BeneficiaryResponse {
     private String bankName;
     private String ifscCode;
     private Long customerId;
+    private String customerNumber;
 
     public BeneficiaryResponse() {
     }
@@ -19,6 +20,17 @@ public class BeneficiaryResponse {
             String bankName,
             String ifscCode,
             Long customerId) {
+        this(id, name, accountNumber, bankName, ifscCode, customerId, null);
+    }
+
+    public BeneficiaryResponse(
+            Long id,
+            String name,
+            String accountNumber,
+            String bankName,
+            String ifscCode,
+            Long customerId,
+            String customerNumber) {
 
         this.id = id;
         this.name = name;
@@ -26,6 +38,7 @@ public class BeneficiaryResponse {
         this.bankName = bankName;
         this.ifscCode = ifscCode;
         this.customerId = customerId;
+        this.customerNumber = customerNumber;
     }
 
     public Long getId() {
@@ -74,5 +87,13 @@ public class BeneficiaryResponse {
 
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
+    }
+
+    public String getCustomerNumber() {
+        return customerNumber;
+    }
+
+    public void setCustomerNumber(String customerNumber) {
+        this.customerNumber = customerNumber;
     }
 }

@@ -11,4 +11,5 @@ public interface ConsentService {
     ConsentResponse getConsentById(Long id);
     ConsentResponse approveConsent(Long id);
     ConsentResponse rejectConsent(Long id);
+    ConsentResponse revokeConsent(Long id);
 }

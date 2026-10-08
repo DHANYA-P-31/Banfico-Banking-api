@@ -17,7 +17,6 @@ public class BeneficiaryRequest {
     @NotBlank(message = "IFSC code is required")
     private String ifscCode;
 
-    @NotNull(message = "Customer ID is required")
     private Long customerId;
 
     public BeneficiaryRequest() {

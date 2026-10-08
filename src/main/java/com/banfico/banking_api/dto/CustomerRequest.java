@@ -16,6 +16,8 @@ public class CustomerRequest {
     private String phoneNumber;
 
     private String address;
+    private String keycloakUserId;
+    private String status;
 
     public CustomerRequest() {
     }
@@ -50,6 +52,22 @@ public class CustomerRequest {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getKeycloakUserId() {
+        return keycloakUserId;
+    }
+
+    public void setKeycloakUserId(String keycloakUserId) {
+        this.keycloakUserId = keycloakUserId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public static class CustomerResponse {

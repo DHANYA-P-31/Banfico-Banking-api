@@ -11,7 +11,13 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
     Optional<Customer> findByPhoneNumber(String phoneNumber);
 
+    Optional<Customer> findByCustomerNumber(String customerNumber);
+
     boolean existsByEmail(String email);
 
     boolean existsByPhoneNumber(String phoneNumber);
-}
+
+    Optional<Customer> findByKeycloakUserId(String keycloakUserId);
+
+    boolean existsByKeycloakUserId(String keycloakUserId);
+}
