@@ -1,238 +1,260 @@
-# Banfico Banking API
+# Banfico Banking API & Open Banking Portal
 
-A Spring Boot backend project developed as part of the Banfico Full Stack Developer Training Program.
+A full-stack banking platform and Open Banking consent management system built with Spring Boot 3, React (Vite), PostgreSQL, and Keycloak IAM. Developed as part of the Banfico Full Stack Developer Training Program.
 
-## Tech Stack
+---
 
-- Java 21
-- Spring Boot
-- Spring Data JPA
-- PostgreSQL
-- Maven
-- Docker
-- Lombok
+## 🚀 Architecture Overview
 
-## Project Structure
+The system uses a single-entry Nginx Reverse Proxy Gateway routing all client traffic:
 
 ```
-controller
-service
-repository
-entity
-dto
-config
-exception
-
+                      ┌─────────────────────────────────────────┐
+                      │          Nginx Gateway (8080)           │
+                      └────┬────────────────┬───────────────┬───┘
+                           │                │               │
+               ┌───────────▼──┐     ┌───────▼──────┐  ┌─────▼─────────┐
+               │ React App    │     │ Spring Boot  │  │ Keycloak IAM  │
+               │ Frontend     │     │ Backend      │  │ (OAuth2/OIDC) │
+               │ (Port 80)    │     │ (Port 8080)  │  │ (Port 8080)   │
+               └──────────────┘     └───────┬──────┘  └───────────────┘
+                                            │
+                                    ┌───────▼──────┐
+                                    │ PostgreSQL   │
+                                    │ Database     │
+                                    │ (Port 5432)  │
+                                    └──────────────┘
 ```
 
-## Prerequisites
+| Gateway URL | Destination Container | Description |
+|---|---|---|
+| `http://localhost:8080/` | `banking-api-frontend` | React Single Page Application |
+| `http://localhost:8080/api/*` | `banking-api-backend` | Spring Boot REST API |
+| `http://localhost:8080/auth/*` | `banking-api-keycloak` | Keycloak Identity & Access Management |
 
-- Java 21
-- Maven
-- PostgreSQL
-- Docker
+---
 
-## Database
+## 🛠️ Tech Stack
 
-```
-CREATE DATABASE banfico;
-```
+- **Backend**: Java 21, Spring Boot 3.x, Spring Data JPA, Spring Security (OAuth2 Resource Server / JWT)
+- **Frontend**: React 18, Vite, React Router v6, Keycloak JS SDK, Vanilla CSS
+- **Identity & Access**: Keycloak 26.x (OpenID Connect / OAuth 2.0)
+- **Database**: PostgreSQL 16
+- **Gateway & Infrastructure**: Nginx 1.27 Alpine, Docker & Docker Compose
+- **Build Tools**: Apache Maven (`mvnw`), npm
 
-## Run the Application
+---
 
-```
-mvn spring-boot:run
-```
+## 🔐 Role-Based Access Control (RBAC)
 
-## Build
+Authentication is handled via JWT tokens issued by Keycloak (`our-bank` realm). The API enforces role-based authorization across four key roles:
 
-```
-mvn clean package
-```
+| Role | Target Portal | Key Capabilities |
+|---|---|---|
+| `ADMIN` | Staff Management | Full CRUD on Customers, Accounts, Online Banking activation & account closure |
+| `MAKER` | Staff Operations | Create Transactions (Deposit/Withdrawal/Transfer), Beneficiaries, & Consent requests |
+| `CHECKER` | Staff Approval | Review & Approve/Reject/Revoke Consents, view accounts and customers |
+| `CUSTOMER` | Self-Service Portal (`/api/me/*`) | View/update profile, manage beneficiaries, view personal accounts & history, approve/reject/revoke own consents |
 
-## Docker
+---
 
-Build:
+## 💻 Prerequisites
 
-```
-docker build -t banking-api .
-```
+- **Java 21 JDK**
+- **Docker & Docker Compose** (v2.0+)
+- **Maven** (bundled wrapper `./mvnw` provided)
+- **Node.js 18+** *(optional, for local frontend development)*
 
-Run:
+---
 
-```
-docker run -p 8080:8080 banking-api
-```
+## 🚀 Quick Start (Docker Compose)
 
-### Full stack through the Nginx gateway
+To start the complete full-stack environment including PostgreSQL, Keycloak, Backend API, Frontend, and Nginx Gateway:
 
-The full local stack is exposed through Nginx on port `8080`. Nginx is the
-single browser entry point and routes requests to the internal services:
+1. **Build backend JAR:**
+   ```powershell
+   ./mvnw.cmd clean package -DskipTests
+   ```
 
-| URL | Destination |
-|---|---|
-| `http://localhost:8080/` | Frontend |
-| `http://localhost:8080/api/*` | Backend API |
-| `http://localhost:8080/auth/*` | Keycloak |
+2. **Launch full stack:**
+   ```powershell
+   docker compose up --build -d
+   ```
 
-Start the complete stack from the repository root:
+3. **Access Application:**
+   - **Frontend App**: [http://localhost:8080](http://localhost:8080)
+   - **Keycloak Admin Console**: [http://localhost:8080/auth/admin](http://localhost:8080/auth/admin) (User: `admin` / Password: `admin`)
+   - **Backend API Health**: [http://localhost:8080/api/health](http://localhost:8080/api/health)
+
+4. **Stop stack:**
+   ```powershell
+   docker compose down
+   ```
+
+---
+
+## ⚡ Local Development Setup
+
+### Database & Security Container Setup
+
+Start PostgreSQL and Keycloak using Docker:
 
 ```powershell
-./mvnw.cmd clean package -DskipTests
-docker compose up --build -d
+docker compose up postgres keycloak -d
 ```
 
-The PostgreSQL data is persisted in the `postgres-data` volume. Keycloak
-imports `keycloak/realm-export.json` on first startup. The gateway publishes
-basic access and error logs in `nginx/logs/` and they can also be viewed with:
+### Running Backend Locally
 
 ```powershell
-docker compose logs -f gateway
+./mvnw.cmd spring-boot:run
 ```
 
-To stop the stack:
+The Spring Boot backend will run on port `8080` (or `8081` depending on application configuration).
+
+### Running Frontend Locally
 
 ```powershell
-docker compose down
+cd banking-frontend
+npm install
+npm run dev
 ```
 
-## APIs
+---
 
-### Consent management
+## 📡 API Reference
 
-Authenticated users can create and review requests for a third party to access
-customer account data:
+### 🏥 Health & System Info
+
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `GET` | `/health` | Root gateway health check | Public |
+| `GET` | `/api/health` | Application status & timestamp | Public |
+| `GET` | `/api/health/database` | PostgreSQL database connection status | Public |
+| `GET` | `/api/info` | Git branch, commit ID & JVM build info | Public |
+
+---
+
+### 👤 Customer Self-Service (`/api/me`)
+
+Endpoints for logged-in bank customers (`CUSTOMER` role):
 
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/api/consents` | Create a pending consent request |
-| GET | `/api/consents` | List consent requests |
-| GET | `/api/consents/{id}` | View one consent request |
-| PUT | `/api/consents/{id}/approve` | Approve a pending request |
-| PUT | `/api/consents/{id}/reject` | Reject a pending request |
+| `GET` | `/api/me/profile` | View customer profile |
+| `PUT` | `/api/me/profile` | Update profile information |
+| `GET` | `/api/me/accounts` | Get customer's accounts |
+| `GET` | `/api/me/accounts/{id}` | Get account details |
+| `GET` | `/api/me/accounts/{id}/transactions` | View account transaction history |
+| `GET` | `/api/me/beneficiaries` | List saved beneficiaries |
+| `POST` | `/api/me/beneficiaries` | Create new beneficiary |
+| `DELETE` | `/api/me/beneficiaries/{id}` | Delete beneficiary |
+| `GET` | `/api/me/consents` | List customer consent requests |
+| `PUT` | `/api/me/consents/{id}/approve` | Approve consent request |
+| `PUT` | `/api/me/consents/{id}/reject` | Reject consent request |
+| `PUT` | `/api/me/consents/{id}/revoke` | Revoke an approved consent |
 
-Consent requests contain a customer, account, third-party name, data scope,
-expiry date, and status (`PENDING`, `APPROVED`, or `REJECTED`). `MAKER` users
-create requests; `CHECKER` or `ADMIN` users approve or reject them.
+---
 
-### Health Check
+### 👥 Customer Management (`/api/customers`)
 
-```
-GET /health
+| Method | Endpoint | Description | Allowed Roles |
+|---|---|---|---|
+| `POST` | `/api/customers` | Create new customer | `ADMIN` |
+| `GET` | `/api/customers` | List all customers | `ADMIN`, `MAKER`, `CHECKER` |
+| `GET` | `/api/customers/{id}` | Get customer by ID | `ADMIN`, `MAKER`, `CHECKER` |
+| `PUT` | `/api/customers/{id}` | Update customer | `ADMIN` |
+| `DELETE` | `/api/customers/{id}` | Delete customer | `ADMIN` |
+| `PUT` | `/api/customers/{id}/online-banking` | Activate online banking (link Keycloak ID) | `ADMIN` |
 
-```
+---
 
-Response:
+### 🏦 Bank Accounts (`/api/accounts`)
 
-```
-Application Running
+| Method | Endpoint | Description | Allowed Roles |
+|---|---|---|---|
+| `POST` | `/api/accounts` | Create account | `ADMIN` |
+| `GET` | `/api/accounts` | List accounts | `ADMIN`, `MAKER`, `CHECKER` |
+| `GET` | `/api/accounts/{id}` | Get account details | `ADMIN`, `MAKER`, `CHECKER` |
+| `PUT` | `/api/accounts/{id}` | Update account | `ADMIN` |
+| `PUT` | `/api/accounts/{id}/close` | Close bank account | `ADMIN` |
+| `DELETE` | `/api/accounts/{id}` | Delete account | `ADMIN` |
 
-```
+---
 
-### Project Info
+### 💸 Transactions (`/api/accounts/{accountId}/transactions`)
 
-```
-GET /api/info
+| Method | Endpoint | Description | Allowed Roles |
+|---|---|---|---|
+| `POST` | `/api/accounts/{accountId}/transactions` | Create transaction (Deposit/Withdrawal/Transfer) | `MAKER` |
+| `GET` | `/api/accounts/{accountId}/transactions` | List transaction history | `ADMIN`, `MAKER`, `CHECKER` |
 
-```
+---
 
-Response
+### 🤝 Beneficiaries (`/api/beneficiaries`)
 
-```
-{
-  "application": "Banfico Banking API",
-  "version": "1.0.0",
-  "status": "Running",
-  "javaVersion": "22.0.2",
-  "serverTime": "2026-07-31T17:04:48.9103003",
-  "gitBranch": "feat/api",
-  "gitCommitId": "ef8ec70"
-}
-```
-### Project Health Check
+| Method | Endpoint | Description | Allowed Roles |
+|---|---|---|---|
+| `POST` | `/api/beneficiaries` | Add beneficiary | `MAKER` |
+| `GET` | `/api/beneficiaries` | List beneficiaries | `ADMIN`, `MAKER`, `CHECKER` |
+| `DELETE` | `/api/beneficiaries/{id}` | Remove beneficiary | `ADMIN`, `CHECKER` |
 
-```
+---
 
-GET /api/health
+### 📜 Open Banking Consents (`/api/consents`)
 
-```
+| Method | Endpoint | Description | Allowed Roles |
+|---|---|---|---|
+| `POST` | `/api/consents` | Create pending consent request | `ADMIN`, `MAKER` |
+| `GET` | `/api/consents` | List consent requests | `ADMIN`, `MAKER`, `CHECKER` |
+| `GET` | `/api/consents/{id}` | View consent request | `ADMIN`, `MAKER`, `CHECKER` |
+| `PUT` | `/api/consents/{id}/approve` | Approve consent request | `ADMIN`, `CHECKER` |
+| `PUT` | `/api/consents/{id}/reject` | Reject consent request | `ADMIN`, `CHECKER` |
+| `PUT` | `/api/consents/{id}/revoke` | Revoke approved consent | `ADMIN`, `CHECKER` |
 
-Response:
+---
 
-```
-{
-  "status": "UP",
-  "application": "banking-api",
-  "timestamp": "2026-08-08T08:41:43.8175595"
-}
-
-```
-
-### Database Health Check
-
-```
-
-GET /api/health/database
-
-```
-
-Response:
-
-```
-{
-  "status": "UP",
-  "database": "PostgreSQL",
-  "connection": "ACTIVE",
-  "timestamp": "2026-08-08T08:40:58.2061614"
-}
+## 🗄️ Project Structure
 
 ```
-## API Endpoints
+banking-api/
+├── docker-compose.yml       # Orchestrates gateway, backend, frontend, Keycloak, & postgres
+├── Dockerfile               # Multi-stage Maven/Java build for backend
+├── README.md
+├── keycloak/                # Keycloak realm export configuration (our-bank realm)
+├── nginx/                   # Reverse proxy configuration & logs
+├── banking-frontend/        # React single page application
+│   ├── src/
+│   │   ├── auth/            # Auth context & Keycloak client
+│   │   ├── components/      # Shared layout & UI components
+│   │   ├── pages/           # Pages (Dashboard, Accounts, Consents, Customer Portal)
+│   │   └── services/        # API service clients
+│   └── Dockerfile
+└── src/
+    └── main/
+        └── java/com/banfico/banking_api/
+            ├── config/      # Security, CORS, Schema Migration & JWT Converter
+            ├── controller/  # REST Controllers
+            ├── dto/         # Request & Response Data Transfer Objects
+            ├── entity/      # JPA Data Entities
+            ├── exception/   # Global Exception Handling
+            ├── repository/  # Spring Data JPA Repositories
+            └── service/     # Business Logic & Audit Trail Services
+```
 
-### Customers
+---
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | /api/customers | Create customer |
-| GET | /api/customers | Get all customers |
-| GET | /api/customers/{id} | Get customer by ID |
-| PUT | /api/customers/{id} | Update customer |
-| DELETE | /api/customers/{id} | Delete customer |
+## 🧪 Validation and Error Handling
 
-### Bank Accounts
+The API uses Jakarta Bean Validation for incoming requests and formats consistent error payloads:
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | /api/accounts | Create account |
-| GET | /api/accounts | Get all accounts |
-| GET | /api/accounts/{accountId} | Get account by ID |
-| PUT | /api/accounts/{accountId} | Update account |
-| DELETE | /api/accounts/{accountId} | Delete account |
+- `200 OK` / `201 Created` / `204 No Content`
+- `400 Bad Request` - Validation failures or invalid state transitions
+- `401 Unauthorized` - Unauthenticated requests
+- `403 Forbidden` - Insufficient role permissions
+- `404 Not Found` - Resource non-existent
 
-### Transactions
+---
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | /api/accounts/{accountId}/transactions | Create transaction |
-| GET | /api/accounts/{accountId}/transactions | Get account transactions |
+## 📄 License
 
-### Beneficiaries
-
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | /api/beneficiaries | Create beneficiary |
-| GET | /api/beneficiaries | Get beneficiaries |
-| DELETE | /api/beneficiaries/{id} | Delete beneficiary |
-
-## Validation and Error Handling
-
-The application uses Jakarta Bean Validation for request validation
-and a global exception handler for consistent error responses.
-
-Common responses:
-
-- 200 OK
-- 201 Created
-- 204 No Content
-- 400 Bad Request
-- 404 Not Found
+Developed for Banfico Training Program. All rights reserved.
