@@ -15,7 +15,7 @@ The system uses a single-entry Nginx Reverse Proxy Gateway routing all client tr
                            │                │               │
                ┌───────────▼──┐     ┌───────▼──────┐  ┌─────▼─────────┐
                │ React App    │     │ Spring Boot  │  │ Keycloak IAM  │
-               │ Frontend     │     │ Backend      │  │ (OAuth2/OIDC) │
+               │ Frontend     │     │ Backend      │  │  │
                │ (Port 80)    │     │ (Port 8080)  │  │ (Port 8080)   │
                └──────────────┘     └───────┬──────┘  └───────────────┘
                                             │
